@@ -5,7 +5,6 @@ let lang = 'de';
 // ── Translations
 const T = {
   de: {
-    header_sub: 'Beauftragter für Künstliche Intelligenz',
     hero_desc: 'Generieren Sie ein valides AI Disclosure Label für Ihr Artefakt.',
     step: 'Schritt 1', step2: 'Schritt 2', step3: 'Schritt 3', step4: 'Schritt 4', step5: 'Schritt 5',
     s1_title: 'Ausmaß der KI-Nutzung',       s1_sub: 'Wie stark war KI an der Entstehung des Artefakts beteiligt?',
@@ -42,7 +41,6 @@ const T = {
     },
   },
   en: {
-    header_sub: 'AI Commissioner',
     hero_desc: 'Generate a valid AI Disclosure Label for your artefact.',
     step: 'Step 1', step2: 'Step 2', step3: 'Step 3', step4: 'Step 4', step5: 'Step 5',
     s1_title: 'Extent of AI Use',    s1_sub: 'How deeply was AI involved in creating this artefact?',

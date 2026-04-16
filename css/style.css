@@ -48,25 +48,16 @@ body {
   display: flex; align-items: center; gap: 14px;
   text-decoration: none;
 }
-/* "uk" key-visual — minimal text mark */
 .uk-mark {
   font-family: var(--font);
   font-weight: 800;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--white);
-  letter-spacing: -1px;
+  letter-spacing: 1px;
   line-height: 1;
   border-left: 3px solid var(--red);
   padding-left: 10px;
 }
-.uni-label {
-  color: rgba(255,255,255,.7);
-  font-size: .75rem;
-  font-weight: 400;
-  letter-spacing: .3px;
-  line-height: 1.3;
-}
-.uni-label strong { color: var(--white); font-weight: 600; display: block; font-size: .82rem; }
 
 .lang-switch {
   display: flex; gap: 4px;
