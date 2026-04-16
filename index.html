@@ -14,6 +14,7 @@
 <header class="site-header">
   <div class="logo-area">
     <span class="uk-mark">AIDL</span>
+    <span class="header-version">v 0.3</span>
   </div>
   <div class="lang-switch">
     <button id="btn-de" class="active" onclick="setLang('de')">DE</button>
@@ -25,12 +26,12 @@
 <main class="page">
 
   <div class="page-title">
-    <h1>AIDL <span class="version-tag">v 0.3</span></h1>
+    <h1 data-i18n="hero_title">AI Disclosure Label Generator</h1>
     <p data-i18n="hero_desc">Generieren Sie ein valides AI Disclosure Label für Ihr Artefakt.</p>
   </div>
 
   <!-- Step 1 -->
-  <div class="step">
+  <div class="step" id="card-stamm">
     <div class="step-header">
       <span class="step-num" data-i18n="step">Schritt 1</span>
       <h2 data-i18n="s1_title">Ausmaß der KI-Nutzung</h2>
@@ -38,21 +39,25 @@
     <p class="step-sub" data-i18n="s1_sub">Wie stark war KI an der Entstehung des Artefakts beteiligt?</p>
     <div class="opts">
       <div class="opt" data-dim="stamm" data-val="N" onclick="pick(this)">
+        <div class="opt-icon" data-icon="N"></div>
         <span class="code">N</span>
         <span class="lbl" data-i18n="n_lbl">No AI</span>
         <span class="dsc" data-i18n="n_dsc">Keine KI-Beteiligung am Artefakt</span>
       </div>
       <div class="opt" data-dim="stamm" data-val="A" onclick="pick(this)">
+        <div class="opt-icon" data-icon="A"></div>
         <span class="code">A</span>
         <span class="lbl" data-i18n="a_lbl">Assistive</span>
         <span class="dsc" data-i18n="a_dsc">Sprachpolitur, Rechtschreibkorrektur, Übersetzung</span>
       </div>
       <div class="opt" data-dim="stamm" data-val="S" onclick="pick(this)">
+        <div class="opt-icon" data-icon="S"></div>
         <span class="code">S</span>
         <span class="lbl" data-i18n="s_lbl">Supportive</span>
         <span class="dsc" data-i18n="s_dsc">Brainstorming, Gliederung, Recherche-Hilfe</span>
       </div>
       <div class="opt" data-dim="stamm" data-val="G" onclick="pick(this)">
+        <div class="opt-icon" data-icon="G"></div>
         <span class="code">G</span>
         <span class="lbl" data-i18n="g_lbl">Generative</span>
         <span class="dsc" data-i18n="g_dsc">Substantielle Text-, Code- oder Datengenerierung</span>
@@ -65,7 +70,6 @@
 
   <!-- Step 2 -->
   <div class="step" id="card-host">
-    <hr class="divider">
     <div class="step-header">
       <span class="step-num" data-i18n="step2">Schritt 2</span>
       <h2 data-i18n="s2_title">Hosting-Kontext</h2>
@@ -73,21 +77,25 @@
     <p class="step-sub" data-i18n="s2_sub">Wo lief das KI-System? Relevant für Datenschutz und DFG-Konformität.</p>
     <div class="opts">
       <div class="opt" data-dim="host" data-val="H:L" onclick="pick(this)">
+        <div class="opt-icon" data-icon="H:L"></div>
         <span class="code">H:L</span>
         <span class="lbl" data-i18n="hl_lbl">Local</span>
         <span class="dsc" data-i18n="hl_dsc">Lokal ausgeführt, keine Datenübertragung (z.B. Ollama)</span>
       </div>
       <div class="opt" data-dim="host" data-val="H:I" onclick="pick(this)">
+        <div class="opt-icon" data-icon="H:I"></div>
         <span class="code">H:I</span>
         <span class="lbl" data-i18n="hi_lbl">Institutional</span>
         <span class="dsc" data-i18n="hi_dsc">Hochschul- oder Behördeninstanz mit interner AVV</span>
       </div>
       <div class="opt" data-dim="host" data-val="H:C" onclick="pick(this)">
+        <div class="opt-icon" data-icon="H:C"></div>
         <span class="code">H:C</span>
         <span class="lbl" data-i18n="hc_lbl">Cloud w/ DPA</span>
         <span class="dsc" data-i18n="hc_dsc">Kommerzieller Cloud-Dienst mit AVV</span>
       </div>
       <div class="opt" data-warn="red" data-dim="host" data-val="H:C!" onclick="pick(this)">
+        <div class="opt-icon" data-icon="H:C!"></div>
         <span class="code">H:C!</span>
         <span class="lbl" data-i18n="hcx_lbl">Cloud w/o DPA</span>
         <span class="dsc" data-i18n="hcx_dsc">Ohne AVV — in vielen Kontexten unzulässig</span>
@@ -97,7 +105,6 @@
 
   <!-- Step 3 -->
   <div class="step" id="card-review">
-    <hr class="divider">
     <div class="step-header">
       <span class="step-num" data-i18n="step3">Schritt 3</span>
       <h2 data-i18n="s3_title">Prüfung der KI-Ausgaben</h2>
@@ -105,21 +112,25 @@
     <p class="step-sub" data-i18n="s3_sub">Wurden die KI-Ausgaben geprüft, bevor sie übernommen wurden?</p>
     <div class="opts">
       <div class="opt" data-dim="review" data-val="R:H" onclick="pick(this)">
+        <div class="opt-icon" data-icon="R:H"></div>
         <span class="code">R:H</span>
         <span class="lbl" data-i18n="rh_lbl">Human reviewed</span>
         <span class="dsc" data-i18n="rh_dsc">Menschliche Prüfung der KI-Ausgaben</span>
       </div>
       <div class="opt" data-dim="review" data-val="R:M" onclick="pick(this)">
+        <div class="opt-icon" data-icon="R:M"></div>
         <span class="code">R:M</span>
         <span class="lbl" data-i18n="rm_lbl">Machine reviewed</span>
         <span class="dsc" data-i18n="rm_dsc">Automatisierte Prüfung (Linter, Faktenchecker)</span>
       </div>
       <div class="opt" data-dim="review" data-val="R:HM" onclick="pick(this)">
+        <div class="opt-icon" data-icon="R:HM"></div>
         <span class="code">R:HM</span>
         <span class="lbl" data-i18n="rhm_lbl">Both</span>
         <span class="dsc" data-i18n="rhm_dsc">Mensch und Maschine haben geprüft</span>
       </div>
       <div class="opt" data-warn="red" data-dim="review" data-val="R:N" onclick="pick(this)">
+        <div class="opt-icon" data-icon="R:N"></div>
         <span class="code">R:N</span>
         <span class="lbl" data-i18n="rn_lbl">None</span>
         <span class="dsc" data-i18n="rn_dsc">Keine Prüfung — Ausgabe unverändert übernommen</span>
@@ -128,25 +139,27 @@
   </div>
 
   <!-- Step 4 -->
-  <div class="step">
-    <hr class="divider">
+  <div class="step" id="card-acc">
     <div class="step-header">
-      <span class="step-num" id="acc-step-label" data-i18n="step4">Schritt 4</span>
+      <span class="step-num" data-i18n="step4">Schritt 4</span>
       <h2 data-i18n="s4_title">Accountability — Verantwortung</h2>
     </div>
     <p class="step-sub" data-i18n="s4_sub">Wer steht für das Artefakt ein?</p>
     <div class="opts">
       <div class="opt" data-dim="acc" data-val="Acc:I" onclick="pick(this)">
+        <div class="opt-icon" data-icon="Acc:I"></div>
         <span class="code">Acc:I</span>
         <span class="lbl" data-i18n="ai_lbl">Individual</span>
         <span class="dsc" data-i18n="ai_dsc">Benennbare Einzelperson (z.B. Autor:in mit ORCID)</span>
       </div>
       <div class="opt" data-dim="acc" data-val="Acc:O" onclick="pick(this)">
+        <div class="opt-icon" data-icon="Acc:O"></div>
         <span class="code">Acc:O</span>
         <span class="lbl" data-i18n="ao_lbl">Organizational</span>
         <span class="dsc" data-i18n="ao_dsc">Organisation übernimmt Verantwortung</span>
       </div>
       <div class="opt" data-warn="red" data-dim="acc" data-val="Acc:N" onclick="pick(this)">
+        <div class="opt-icon" data-icon="Acc:N"></div>
         <span class="code">Acc:N</span>
         <span class="lbl" data-i18n="an_lbl">None claimed</span>
         <span class="dsc" data-i18n="an_dsc">Rein agentischer Raum — kein Mensch steht ein</span>
@@ -156,7 +169,6 @@
 
   <!-- Step 5 -->
   <div class="step" id="card-tool">
-    <hr class="divider">
     <div class="step-header">
       <span class="step-num" data-i18n="step5">Schritt 5</span>
       <h2 data-i18n="s5_title">Tool-Angabe</h2>
@@ -168,8 +180,6 @@
     </div>
   </div>
 
-  <hr class="divider">
-
   <!-- Warning -->
   <div class="warn-banner" id="warn-banner" data-i18n="warn_txt">
     ⚠ Die gewählte Kombination enthält kritische Merkmale. In vielen institutionellen Kontexten ist diese Konfiguration problematisch oder unzulässig.
@@ -178,15 +188,21 @@
   <!-- Result -->
   <div class="result-block">
     <div class="result-label" data-i18n="result_label">Ihr AIDL-Label</div>
-    <div class="label-out" id="label-out">
+
+    <div id="badge-container">
       <span class="ph" data-i18n="result_ph">Bitte alle Felder ausfüllen …</span>
     </div>
+
+    <div class="label-out" id="label-out" style="display:none;"></div>
     <p class="explain" id="explain-out"></p>
+
     <div class="copy-row">
       <button class="copy-btn" data-fmt="plain"  onclick="copyAs('plain')"  data-i18n="btn_text">Text kopieren</button>
       <button class="copy-btn" data-fmt="meta"   onclick="copyAs('meta')"   data-i18n="btn_meta">HTML &lt;meta&gt;</button>
       <button class="copy-btn" data-fmt="md"     onclick="copyAs('md')"     data-i18n="btn_md">Markdown</button>
       <button class="copy-btn" data-fmt="latex"  onclick="copyAs('latex')"  data-i18n="btn_latex">LaTeX</button>
+      <button class="copy-btn" data-fmt="link"   onclick="copyAs('link')"   data-i18n="btn_link">Link kopieren</button>
+      <button class="copy-btn" onclick="downloadBadge()" data-i18n="btn_badge">Badge ↓ SVG</button>
     </div>
   </div>
 
@@ -197,6 +213,7 @@
 
 </main>
 
+<script src="js/icons.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
