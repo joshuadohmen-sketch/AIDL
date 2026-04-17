@@ -1,4 +1,4 @@
-// ── AIDL Piktogramme (CC-style SVG icons)
+// ── AI-DTL Piktogramme (CC-style SVG icons)
 // Each icon is a simple, bold, monochrome path inside a 24×24 viewBox.
 
 const ICONS = {
@@ -29,7 +29,7 @@ const ICONS = {
 // Render an icon SVG element
 function iconSVG(key, size = 24) {
   if (!ICONS[key]) return '';
-  return `<svg class="aidl-icon" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${ICONS[key]}</svg>`;
+  return `<svg class="dtl-icon" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${ICONS[key]}</svg>`;
 }
 
 // ── Badge rendering
@@ -68,7 +68,7 @@ function buildBadgeSVG(state, labelText) {
             fill="#666">${d.code}</text>`;
   });
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${h}" width="${totalW}" class="aidl-badge">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${h}" width="${totalW}" class="dtl-badge">
     ${circles}
   </svg>`;
 }
@@ -84,7 +84,7 @@ function downloadBadge() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'aidl-badge.svg';
+  a.download = 'dtl-badge.svg';
   a.click();
   URL.revokeObjectURL(url);
 }

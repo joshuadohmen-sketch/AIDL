@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIDL Label</title>
+  <title>AI-DTL Label</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -123,7 +123,7 @@
 
 <header class="site-header">
   <a class="logo-area" href="../">
-    <span class="uk-mark">AIDL</span>
+    <span class="uk-mark">AI-DTL</span>
     <span class="header-version">v 0.3</span>
   </a>
   <div class="lang-switch">
@@ -135,7 +135,7 @@
 <main class="page">
   <div id="content"></div>
   <footer>
-    <span>AIDL Working Draft 0.3 · April 2026</span>
+    <span>AI-DTL Working Draft 0.3 · April 2026</span>
     <span><a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a></span>
   </footer>
 </main>
@@ -146,12 +146,12 @@ let lang = 'de';
 
 const T = {
   de: {
-    page_title: 'AI Disclosure Label',
-    page_sub: 'Dieses Artefakt trägt folgendes AIDL-Label:',
+    page_title: 'AI Disclosure & Transparency Label',
+    page_sub: 'Dieses Artefakt trägt folgendes AI-DTL-Label:',
     create_own: 'Eigenes Label erstellen',
-    create_sub: 'Verwenden Sie den AIDL Generator, um ein Label für Ihr Artefakt zu erzeugen.',
+    create_sub: 'Verwenden Sie den AI-DTL Generator, um ein Label für Ihr Artefakt zu erzeugen.',
     invalid: 'Ungültiges Label',
-    invalid_sub: 'Die URL enthält kein gültiges AIDL-Label. Bitte verwenden Sie den Generator.',
+    invalid_sub: 'Die URL enthält kein gültiges AI-DTL-Label. Bitte verwenden Sie den Generator.',
     tool_used: 'Verwendetes KI-System',
     dims: {
       N:     { title: 'Keine KI-Beteiligung', desc: 'Dieses Artefakt wurde vollständig ohne KI-Unterstützung erstellt.' },
@@ -172,12 +172,12 @@ const T = {
     },
   },
   en: {
-    page_title: 'AI Disclosure Label',
-    page_sub: 'This artefact carries the following AIDL label:',
+    page_title: 'AI Disclosure & Transparency Label',
+    page_sub: 'This artefact carries the following AI-DTL label:',
     create_own: 'Create your own label',
-    create_sub: 'Use the AIDL Generator to create a label for your artefact.',
+    create_sub: 'Use the AI-DTL Generator to create a label for your artefact.',
     invalid: 'Invalid label',
-    invalid_sub: 'This URL does not contain a valid AIDL label. Please use the generator.',
+    invalid_sub: 'This URL does not contain a valid AI-DTL label. Please use the generator.',
     tool_used: 'AI system used',
     dims: {
       N:     { title: 'No AI involvement', desc: 'This artefact was created entirely without AI assistance.' },
@@ -223,10 +223,10 @@ function parseParams() {
 
 function buildLabelString(p) {
   if (!p.stamm || !p.acc) return null;
-  if (p.stamm === 'N') return `AIDL 0.3: N;${p.acc}`;
+  if (p.stamm === 'N') return `AI-DTL 0.3: N;${p.acc}`;
   if (!p.host || !p.review) return null;
   const tool = p.tool ? ` (${p.tool}${p.date ? ', ' + p.date : ''})` : '';
-  return `AIDL 0.3: ${p.stamm}/${p.host};${p.review};${p.acc}${tool}`;
+  return `AI-DTL 0.3: ${p.stamm}/${p.host};${p.review};${p.acc}${tool}`;
 }
 
 function renderDimCard(code) {
@@ -262,11 +262,11 @@ function renderPage() {
       <div class="cta">
         <a href="../">${t.create_own}</a>
       </div>`;
-    document.title = 'AIDL — ' + t.invalid;
+    document.title = 'AI-DTL — ' + t.invalid;
     return;
   }
 
-  document.title = 'AIDL — ' + label;
+  document.title = 'AI-DTL — ' + label;
 
   // Build badge
   const state = { stamm: p.stamm, host: p.host, review: p.review, acc: p.acc };

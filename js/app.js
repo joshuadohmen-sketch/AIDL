@@ -5,8 +5,8 @@ let lang = 'de';
 // ── Translations
 const T = {
   de: {
-    hero_title: 'AI Disclosure Label Generator',
-    hero_desc: 'Generieren Sie ein valides AI Disclosure Label für Ihr Artefakt.',
+    hero_title: 'AI Disclosure & Transparency Label Generator',
+    hero_desc: 'Generieren Sie ein valides AI-DTL für Ihr Artefakt.',
     step: 'Schritt 1', step2: 'Schritt 2', step3: 'Schritt 3', step4: 'Schritt 4', step5: 'Schritt 5',
     s1_title: 'Ausmaß der KI-Nutzung',        s1_sub: 'Wie stark war KI an der Entstehung des Artefakts beteiligt?',
     s2_title: 'Hosting-Kontext',               s2_sub: 'Wo lief das KI-System? Relevant für Datenschutz und DFG-Konformität.',
@@ -30,7 +30,7 @@ const T = {
     an_lbl: 'None claimed',    an_dsc: 'Rein agentischer Raum — kein Mensch steht ein',
     tool_ph: 'z.B. Claude Opus 4.6',
     warn_txt: '⚠ Die gewählte Kombination enthält kritische Merkmale (H:C!, R:N und/oder Acc:N). In vielen institutionellen Kontexten ist diese Konfiguration problematisch oder unzulässig.',
-    result_label: 'Ihr AIDL-Label',
+    result_label: 'Ihr AI-DTL-Label',
     result_ph: 'Bitte alle Felder ausfüllen …',
     btn_text: 'Text kopieren', btn_meta: 'HTML <meta>', btn_md: 'Markdown', btn_latex: 'LaTeX', btn_link: 'Link kopieren', btn_badge: 'Badge ↓ SVG',
     no_ai_hint: 'Bei N entfallen Host, Review und Tool. Bitte Accountability auswählen.',
@@ -42,8 +42,8 @@ const T = {
     },
   },
   en: {
-    hero_title: 'AI Disclosure Label Generator',
-    hero_desc: 'Generate a valid AI Disclosure Label for your artefact.',
+    hero_title: 'AI Disclosure & Transparency Label Generator',
+    hero_desc: 'Generate a valid AI-DTL for your artefact.',
     step: 'Step 1', step2: 'Step 2', step3: 'Step 3', step4: 'Step 4', step5: 'Step 5',
     s1_title: 'Extent of AI Use',    s1_sub: 'How deeply was AI involved in creating this artefact?',
     s2_title: 'Hosting Context',     s2_sub: 'Where did the AI run? Relevant for data protection and DFG compliance.',
@@ -67,7 +67,7 @@ const T = {
     an_lbl: 'None claimed',    an_dsc: 'Purely agentic context — no human stands behind this',
     tool_ph: 'e.g. Claude Opus 4.6',
     warn_txt: '⚠ This combination contains critical markers (H:C!, R:N and/or Acc:N). In many institutional contexts this configuration may be problematic or unlawful.',
-    result_label: 'Your AIDL Label',
+    result_label: 'Your AI-DTL Label',
     result_ph: 'Please complete all fields …',
     btn_text: 'Copy text', btn_meta: 'HTML <meta>', btn_md: 'Markdown', btn_latex: 'LaTeX', btn_link: 'Copy link', btn_badge: 'Badge ↓ SVG',
     no_ai_hint: 'For N, Host, Review and Tool are omitted. Please select Accountability.',
@@ -156,12 +156,12 @@ function fmtDate(v) {
 function buildLabel() {
   const { stamm, host, review, acc } = S;
   if (!stamm || !acc) return null;
-  if (stamm === 'N') return `AIDL 0.3: N;${acc}`;
+  if (stamm === 'N') return `AI-DTL 0.3: N;${acc}`;
   if (!host || !review) return null;
   const name = document.getElementById('tool-name').value.trim();
   const date = document.getElementById('tool-date').value;
   const tool = name ? ` (${name}${date ? ', ' + fmtDate(date) : ''})` : '';
-  return `AIDL 0.3: ${stamm}/${host};${review};${acc}${tool}`;
+  return `AI-DTL 0.3: ${stamm}/${host};${review};${acc}${tool}`;
 }
 
 function buildLabelURL() {
