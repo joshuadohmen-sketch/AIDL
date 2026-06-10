@@ -11,7 +11,7 @@ const T = {
     s1_title: 'Ausmaß der KI-Nutzung',        s1_sub: 'Wie stark war KI an der Entstehung des Artefakts beteiligt?',
     s2_title: 'Hosting-Kontext',               s2_sub: 'Wo lief das KI-System? Relevant für Datenschutz und DFG-Konformität.',
     s3_title: 'Prüfung der KI-Ausgaben',       s3_sub: 'Wurden die KI-Ausgaben geprüft, bevor sie übernommen wurden?',
-    s4_title: 'Accountability — Verantwortung', s4_sub: 'Wer steht für das Artefakt ein?',
+    s4_title: 'Accountability – Verantwortung', s4_sub: 'Wer steht für das Artefakt ein?',
     s5_title: 'Tool-Angabe',                   s5_sub: 'Welches KI-System wurde verwendet? Name, Version und Monat der Nutzung.',
     n_lbl: 'No AI',           n_dsc: 'Keine KI-Beteiligung am Artefakt',
     a_lbl: 'Assistive',       a_dsc: 'Sprachpolitur, Rechtschreibkorrektur, Übersetzung',
@@ -20,20 +20,22 @@ const T = {
     hl_lbl: 'Local',          hl_dsc: 'Lokal ausgeführt, keine Datenübertragung (z.B. Ollama)',
     hi_lbl: 'Institutional',  hi_dsc: 'Hochschul- oder Behördeninstanz mit interner AVV',
     hc_lbl: 'Cloud w/ DPA',   hc_dsc: 'Kommerzieller Cloud-Dienst mit Auftragsverarbeitungsvertrag',
-    hcx_lbl: 'Cloud w/o DPA', hcx_dsc: 'Ohne AVV — in vielen Kontexten unzulässig',
+    hcx_lbl: 'Cloud w/o DPA', hcx_dsc: 'Ohne AVV – in vielen Kontexten unzulässig',
     rh_lbl: 'Human reviewed',  rh_dsc: 'Menschliche Prüfung der KI-Ausgaben',
     rm_lbl: 'Machine reviewed', rm_dsc: 'Automatisierte Prüfung (Linter, Faktenchecker)',
     rhm_lbl: 'Both',           rhm_dsc: 'Mensch und Maschine haben geprüft',
-    rn_lbl: 'None',            rn_dsc: 'Keine Prüfung — Ausgabe unverändert übernommen',
+    rn_lbl: 'None',            rn_dsc: 'Keine Prüfung – Ausgabe unverändert übernommen',
     ai_lbl: 'Individual',      ai_dsc: 'Benennbare Einzelperson (z.B. Autor:in mit ORCID)',
     ao_lbl: 'Organizational',  ao_dsc: 'Organisation übernimmt Verantwortung',
-    an_lbl: 'None claimed',    an_dsc: 'Rein agentischer Raum — kein Mensch steht ein',
+    an_lbl: 'None claimed',    an_dsc: 'Rein agentischer Raum – kein Mensch steht ein',
     tool_ph: 'z.B. Claude Opus 4.6',
     warn_txt: '⚠ Die gewählte Kombination enthält kritische Merkmale (H:C!, R:N und/oder Acc:N). In vielen institutionellen Kontexten ist diese Konfiguration problematisch oder unzulässig.',
     result_label: 'Ihr AI-DTL-Label',
     result_ph: 'Bitte alle Felder ausfüllen …',
     btn_text: 'Text kopieren', btn_meta: 'HTML <meta>', btn_md: 'Markdown', btn_latex: 'LaTeX', btn_link: 'Link kopieren', btn_badge: 'Badge ↓ SVG',
     no_ai_hint: 'Bei N entfallen Host, Review und Tool. Bitte Accountability auswählen.',
+    month_ph: 'Monat', year_ph: 'Jahr',
+    months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
     exp: {
       N: 'Keine KI-Beteiligung', A: 'Assistive Nutzung', S: 'Supportive Nutzung', G: 'Generative Nutzung',
       'H:L': 'lokal gehostet', 'H:I': 'institutionell gehostet', 'H:C': 'Cloud mit AVV', 'H:C!': '⚠ Cloud ohne AVV',
@@ -57,20 +59,22 @@ const T = {
     hl_lbl: 'Local',          hl_dsc: 'Locally executed, no data transfer (e.g. Ollama)',
     hi_lbl: 'Institutional',  hi_dsc: 'University or authority instance with internal DPA',
     hc_lbl: 'Cloud w/ DPA',   hc_dsc: 'Commercial cloud service with data processing agreement',
-    hcx_lbl: 'Cloud w/o DPA', hcx_dsc: 'No DPA — unlawful in many contexts',
+    hcx_lbl: 'Cloud w/o DPA', hcx_dsc: 'No DPA – unlawful in many contexts',
     rh_lbl: 'Human reviewed',  rh_dsc: 'Human review of AI output',
     rm_lbl: 'Machine reviewed', rm_dsc: 'Automated review (linter, fact-checker)',
     rhm_lbl: 'Both',           rhm_dsc: 'Human and machine reviewed',
-    rn_lbl: 'None',            rn_dsc: 'No review — AI output adopted unchanged',
+    rn_lbl: 'None',            rn_dsc: 'No review – AI output adopted unchanged',
     ai_lbl: 'Individual',      ai_dsc: 'Named individual (e.g. author with ORCID)',
     ao_lbl: 'Organizational',  ao_dsc: 'Organization takes responsibility',
-    an_lbl: 'None claimed',    an_dsc: 'Purely agentic context — no human stands behind this',
+    an_lbl: 'None claimed',    an_dsc: 'Purely agentic context – no human stands behind this',
     tool_ph: 'e.g. Claude Opus 4.6',
     warn_txt: '⚠ This combination contains critical markers (H:C!, R:N and/or Acc:N). In many institutional contexts this configuration may be problematic or unlawful.',
     result_label: 'Your AI-DTL Label',
     result_ph: 'Please complete all fields …',
     btn_text: 'Copy text', btn_meta: 'HTML <meta>', btn_md: 'Markdown', btn_latex: 'LaTeX', btn_link: 'Copy link', btn_badge: 'Badge ↓ SVG',
     no_ai_hint: 'For N, Host, Review and Tool are omitted. Please select Accountability.',
+    month_ph: 'Month', year_ph: 'Year',
+    months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
     exp: {
       N: 'No AI involvement', A: 'Assistive use', S: 'Supportive use', G: 'Generative use',
       'H:L': 'locally hosted', 'H:I': 'institutionally hosted', 'H:C': 'cloud with DPA', 'H:C!': '⚠ cloud without DPA',
@@ -87,6 +91,8 @@ function setLang(l) {
   document.getElementById('btn-en').classList.toggle('active', l === 'en');
   document.documentElement.lang = l;
   applyT();
+  closeAllDD();
+  refreshDDButtons();
   render();
 }
 
@@ -147,10 +153,10 @@ function updateStepStates() {
 }
 
 // ── Label construction
-function fmtDate(v) {
-  if (!v) return '';
-  const [y, m] = v.split('-');
-  return `${m}/${y}`;
+const dateState = { month: '', year: '' };
+
+function getToolDate() {
+  return dateState.month && dateState.year ? `${dateState.month}/${dateState.year}` : '';
 }
 
 function buildLabel() {
@@ -159,8 +165,8 @@ function buildLabel() {
   if (stamm === 'N') return `AI-DTL 0.3: N;${acc}`;
   if (!host || !review) return null;
   const name = document.getElementById('tool-name').value.trim();
-  const date = document.getElementById('tool-date').value;
-  const tool = name ? ` (${name}${date ? ', ' + fmtDate(date) : ''})` : '';
+  const date = getToolDate();
+  const tool = name ? ` (${name}${date ? ', ' + date : ''})` : '';
   return `AI-DTL 0.3: ${stamm}/${host};${review};${acc}${tool}`;
 }
 
@@ -176,9 +182,9 @@ function buildLabelURL() {
   }
   params.set('a', acc);
   const name = document.getElementById('tool-name').value.trim();
-  const date = document.getElementById('tool-date').value;
+  const date = getToolDate();
   if (name) params.set('t', name);
-  if (date) params.set('d', fmtDate(date));
+  if (date) params.set('d', date);
   return `${base}/label/?${params.toString()}`;
 }
 
@@ -262,6 +268,138 @@ function fallbackCopy(text, cb) {
   document.body.removeChild(ta);
 }
 
+// ── Date dropdowns (custom, cross-browser instead of native <select>)
+function ddItems(kind) {
+  const t = T[lang];
+  if (kind === 'month') {
+    return t.months.map((m, i) => ({ v: String(i + 1).padStart(2, '0'), l: m }));
+  }
+  const thisYear = new Date().getFullYear();
+  return Array.from({ length: 8 }, (_, i) => String(thisYear + 1 - i)).map(y => ({ v: y, l: y }));
+}
+
+function ddPlaceholder(kind) {
+  return kind === 'month' ? T[lang].month_ph : T[lang].year_ph;
+}
+
+function refreshDDButtons() {
+  ['month', 'year'].forEach(kind => {
+    const btn = document.getElementById(`dd-${kind}-btn`);
+    const found = ddItems(kind).find(it => it.v === dateState[kind]);
+    btn.textContent = found ? found.l : ddPlaceholder(kind);
+    btn.classList.toggle('placeholder', !found);
+  });
+}
+
+function closeAllDD() {
+  document.querySelectorAll('.dd-list.open').forEach(l => l.classList.remove('open'));
+}
+
+function initDateDropdowns() {
+  ['month', 'year'].forEach(kind => {
+    const btn = document.getElementById(`dd-${kind}-btn`);
+    const list = document.getElementById(`dd-${kind}-list`);
+
+    btn.addEventListener('click', () => {
+      const wasOpen = list.classList.contains('open');
+      closeAllDD();
+      if (wasOpen) return;
+      let html = `<div class="dd-item dd-clear" data-v="">${ddPlaceholder(kind)} –</div>`;
+      html += ddItems(kind).map(it =>
+        `<div class="dd-item${it.v === dateState[kind] ? ' selected' : ''}" data-v="${it.v}">${it.l}</div>`
+      ).join('');
+      list.innerHTML = html;
+      list.classList.add('open');
+      const sel = list.querySelector('.dd-item.selected');
+      if (sel) sel.scrollIntoView({ block: 'nearest' });
+    });
+
+    list.addEventListener('mousedown', e => {
+      const item = e.target.closest('.dd-item');
+      if (!item) return;
+      e.preventDefault();
+      dateState[kind] = item.dataset.v;
+      closeAllDD();
+      refreshDDButtons();
+      render();
+    });
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.dd-wrap')) closeAllDD();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeAllDD();
+  });
+  refreshDDButtons();
+}
+
+// ── Tool autocomplete
+function initAutocomplete() {
+  const input = document.getElementById('tool-name');
+  const list = document.getElementById('ac-list');
+  let flat = [];
+  let active = -1;
+
+  function close() { list.classList.remove('open'); active = -1; }
+
+  function renderList(q) {
+    const qq = q.trim().toLowerCase();
+    // Vorschläge erst ab 2 Zeichen – Freitext bleibt immer möglich
+    if (qq.length < 2) { close(); return; }
+    let html = '';
+    flat = [];
+    AI_TOOLS.forEach(g => {
+      const hits = g.items.filter(t => t.toLowerCase().includes(qq));
+      if (!hits.length) return;
+      html += `<div class="ac-group">${g.group}</div>`;
+      hits.forEach(t => {
+        const idx = flat.length;
+        flat.push(t);
+        let lbl = t;
+        if (qq) {
+          const i = t.toLowerCase().indexOf(qq);
+          lbl = t.slice(0, i) + '<b>' + t.slice(i, i + qq.length) + '</b>' + t.slice(i + qq.length);
+        }
+        html += `<div class="ac-item" data-i="${idx}">${lbl}</div>`;
+      });
+    });
+    list.innerHTML = html;
+    list.classList.toggle('open', flat.length > 0);
+    active = -1;
+  }
+
+  function selectVal(v) {
+    input.value = v;
+    close();
+    render();
+  }
+
+  input.addEventListener('input', () => { renderList(input.value); render(); });
+  input.addEventListener('focus', () => renderList(input.value));
+  input.addEventListener('keydown', e => {
+    if (!list.classList.contains('open')) return;
+    const items = list.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown')      { e.preventDefault(); active = Math.min(active + 1, items.length - 1); }
+    else if (e.key === 'ArrowUp')   { e.preventDefault(); active = Math.max(active - 1, 0); }
+    else if (e.key === 'Enter')     { e.preventDefault(); if (active >= 0) selectVal(flat[active]); return; }
+    else if (e.key === 'Escape')    { close(); return; }
+    else return;
+    items.forEach((el, i) => el.classList.toggle('active', i === active));
+    if (items[active]) items[active].scrollIntoView({ block: 'nearest' });
+  });
+  // mousedown statt click, damit das Input-blur die Auswahl nicht verschluckt
+  list.addEventListener('mousedown', e => {
+    const item = e.target.closest('.ac-item');
+    if (item) { e.preventDefault(); selectVal(flat[+item.dataset.i]); }
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.ac-wrap')) close();
+  });
+}
+
 // ── Init
 applyT();
 injectIcons();
+initDateDropdowns();
+initAutocomplete();

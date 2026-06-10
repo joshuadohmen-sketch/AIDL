@@ -57,6 +57,17 @@ body {
   border-left: 3px solid var(--red);
   padding-left: 10px;
 }
+.header-sub {
+  font-size: .68rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.45);
+  letter-spacing: .4px;
+}
+.header-sub em {
+  font-style: normal;
+  color: rgba(255,255,255,.28);
+  margin-left: 6px;
+}
 .header-version {
   font-size: .65rem;
   font-weight: 600;
@@ -115,9 +126,10 @@ body {
 .step {
   background: var(--white);
   border: 1px solid var(--g200);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
   transition: box-shadow .15s;
 }
 .step.completed {
@@ -160,12 +172,12 @@ body {
   gap: 8px;
 }
 .opt {
-  background: var(--g100);
-  border: 2px solid transparent;
-  border-radius: 6px;
+  background: var(--white);
+  border: 1.5px solid var(--g200);
+  border-radius: 8px;
   padding: 1rem;
   cursor: pointer;
-  transition: all .12s;
+  transition: border-color .12s, background .12s, box-shadow .12s, transform .12s;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -174,12 +186,22 @@ body {
   gap: 6px;
 }
 .opt:hover {
-  border-color: var(--g200);
-  background: var(--white);
+  border-color: var(--g400);
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  transform: translateY(-1px);
 }
 .opt.selected {
   background: var(--black);
   border-color: var(--black);
+}
+.opt.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 6px;
+  right: 9px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.9);
 }
 .opt.selected .opt-icon { color: var(--white); }
 .opt.selected .code,
@@ -232,9 +254,13 @@ body {
 
 /* ── Tool inputs ─────────────────────────────────────────── */
 .tool-row { display: flex; gap: .6rem; flex-wrap: wrap; }
-.tool-row input {
+.ac-wrap {
+  position: relative;
   flex: 2;
-  min-width: 140px;
+  min-width: 170px;
+}
+.tool-row input,
+.dd-btn {
   font-family: var(--font);
   font-size: .88rem;
   border: 2px solid var(--g200);
@@ -243,12 +269,94 @@ body {
   background: var(--g100);
   transition: border-color .15s, background .15s;
   border-radius: 4px;
+  color: var(--black);
 }
-.tool-row input:focus {
+.ac-wrap input { width: 100%; }
+.tool-row input:focus,
+.dd-btn:focus {
   background: var(--white);
   border-color: var(--red);
 }
 .tool-row input::placeholder { color: var(--g400); }
+
+/* ── Date dropdowns (custom, cross-browser) ─────────────── */
+.dd-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 110px;
+}
+.dd-btn {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  padding-right: 1.8rem;
+  position: relative;
+}
+.dd-btn::after {
+  content: '▾';
+  position: absolute;
+  right: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--g400);
+  font-size: .7rem;
+}
+.dd-btn.placeholder { color: var(--g400); }
+.dd-list {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--g200);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 60;
+  display: none;
+}
+.dd-list.open { display: block; }
+.dd-item {
+  padding: .4rem .8rem;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.dd-item:hover { background: var(--g100); }
+.dd-item.selected { font-weight: 700; color: var(--red); }
+.dd-item.dd-clear { color: var(--g400); font-style: italic; }
+
+/* ── Autocomplete dropdown ──────────────────────────────── */
+.ac-list {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--g200);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 60;
+  display: none;
+}
+.ac-list.open { display: block; }
+.ac-group {
+  padding: .4rem .8rem .1rem;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: var(--g400);
+}
+.ac-item {
+  padding: .4rem .8rem;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.ac-item:hover, .ac-item.active { background: var(--g100); }
+.ac-item b { font-weight: 700; color: var(--red); }
 
 /* ── Warn banner ─────────────────────────────────────────── */
 .warn-banner {
@@ -386,6 +494,7 @@ footer a:hover { text-decoration: underline; }
 @media (max-width: 560px) {
   .page { padding: 1.5rem 1rem 3rem; }
   .site-header { padding: 0 1rem; }
+  .header-sub { display: none; }
   .opts { grid-template-columns: 1fr 1fr; }
   .page-title h1 { font-size: 1rem; }
   .step { padding: 1rem; }
