@@ -18,7 +18,7 @@ body {
   font-family: var(--font);
   background: var(--g100);
   color: var(--black);
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.6;
 }
 
@@ -26,7 +26,7 @@ body {
 .site-header {
   background: var(--black);
   padding: 0 2rem;
-  height: 56px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,7 +38,7 @@ body {
   content: '';
   display: block;
   position: absolute;
-  top: 56px; left: 0; right: 0;
+  top: 64px; left: 0; right: 0;
   height: 3px;
   background: var(--red);
 }
@@ -219,8 +219,8 @@ body {
 
 /* ── Option icon ───────────────────────────────────────── */
 .opt-icon {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -228,8 +228,8 @@ body {
   margin-bottom: 2px;
 }
 .opt-icon .dtl-icon {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
 }
 
 .code {
@@ -499,6 +499,6 @@ footer a:hover { text-decoration: underline; }
   .page-title h1 { font-size: 1rem; }
   .step { padding: 1rem; }
   .opt { padding: .75rem .5rem; }
-  .opt-icon { width: 28px; height: 28px; }
-  .opt-icon .dtl-icon { width: 24px; height: 24px; }
+  .opt-icon { width: 34px; height: 34px; }
+  .opt-icon .dtl-icon { width: 28px; height: 28px; }
 }
