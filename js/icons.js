@@ -104,8 +104,6 @@ function downloadBadgePNG() {
     const canvas = document.createElement('canvas');
     canvas.width = w * scale; canvas.height = h * scale;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.scale(scale, scale);
     ctx.drawImage(img, 0, 0);
     canvas.toBlob(pngBlob => {
