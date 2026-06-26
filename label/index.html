@@ -21,19 +21,18 @@
     body { font-family: var(--font); background: var(--g100); color: var(--black); font-size: 18px; line-height: 1.6; }
 
     .site-header {
-      background: var(--black); padding: 0 2rem; height: 56px;
-      display: flex; align-items: center; justify-content: space-between;
+      background: var(--black); padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
     }
     .site-header::after {
       content: ''; display: block; position: absolute;
-      top: 56px; left: 0; right: 0; height: 3px; background: var(--red);
+      top: 64px; left: 0; right: 0; height: 3px; background: var(--red);
     }
     .logo-area { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     .uk-mark {
       font-family: var(--font); font-weight: 800; font-size: 1.2rem;
       color: var(--white); letter-spacing: 1.5px; border-left: 3px solid var(--red); padding-left: 10px;
     }
-    .header-version { font-size: .65rem; font-weight: 600; color: rgba(255,255,255,.35); }
     .header-sub { font-size: .68rem; font-weight: 400; color: rgba(255,255,255,.45); letter-spacing: .4px; }
     .header-sub em { font-style: normal; color: rgba(255,255,255,.28); margin-left: 6px; }
     @media (max-width: 560px) { .header-sub { display: none; } }
@@ -47,19 +46,14 @@
 
     .page { max-width: 700px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
 
-    /* ── Badge hero ── */
-    .badge-hero {
-      text-align: center; padding: 2.5rem 0 2rem;
-    }
+    .badge-hero { text-align: center; padding: 2.5rem 0 2rem; }
     .badge-hero svg { max-width: 100%; }
     .label-string {
       font-family: 'Courier New', monospace; font-size: .95rem; font-weight: 700;
       background: var(--white); border: 1px solid var(--g200); border-radius: 4px;
-      padding: .6rem 1rem; margin-top: 1.2rem; display: inline-block;
-      word-break: break-all;
+      padding: .6rem 1rem; margin-top: 1.2rem; display: inline-block; word-break: break-all;
     }
 
-    /* ── Dimension cards ── */
     .dim-card {
       background: var(--white); border: 1px solid var(--g200); border-radius: 6px;
       padding: 1.2rem 1.5rem; margin-bottom: .75rem;
@@ -74,39 +68,26 @@
     .dim-icon.warn { background: var(--red); }
     .dim-icon svg { width: 28px; height: 28px; }
     .dim-body { flex: 1; }
-    .dim-code {
-      font-family: 'Courier New', monospace; font-size: .75rem; font-weight: 700;
-      color: var(--g400); letter-spacing: .5px;
-    }
+    .dim-code { font-family: 'Courier New', monospace; font-size: .75rem; font-weight: 700; color: var(--g400); letter-spacing: .5px; }
     .dim-title { font-size: .95rem; font-weight: 700; margin: 2px 0; }
     .dim-desc { font-size: .82rem; color: var(--g700); line-height: 1.45; }
 
-    /* ── Tool info ── */
     .tool-info {
       background: var(--white); border: 1px solid var(--g200); border-radius: 6px;
-      padding: 1.2rem 1.5rem; margin-bottom: .75rem;
-      font-size: .9rem; color: var(--g700);
+      padding: 1.2rem 1.5rem; margin-bottom: .75rem; font-size: .9rem; color: var(--g700);
     }
     .tool-info strong { color: var(--black); }
 
-    /* ── CTA ── */
-    .cta {
-      text-align: center; margin-top: 2rem; padding-top: 1.5rem;
-      border-top: 1px solid var(--g200);
-    }
+    .cta { text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--g200); }
     .cta a {
       display: inline-block; background: var(--red); color: var(--white);
       text-decoration: none; font-weight: 700; font-size: .85rem;
-      padding: .6rem 1.5rem; border-radius: 4px; letter-spacing: .3px;
-      transition: opacity .15s;
+      padding: .6rem 1.5rem; border-radius: 4px; letter-spacing: .3px; transition: opacity .15s;
     }
     .cta a:hover { opacity: .85; }
     .cta p { margin-top: .6rem; font-size: .75rem; color: var(--g400); }
 
-    /* ── Error ── */
-    .error {
-      text-align: center; padding: 4rem 1rem; color: var(--g400);
-    }
+    .error { text-align: center; padding: 4rem 1rem; color: var(--g400); }
     .error h2 { font-size: 1.2rem; color: var(--black); margin-bottom: .5rem; }
 
     footer {
@@ -115,6 +96,7 @@
       display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem;
     }
     footer a { color: var(--g700); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
 
     @media (max-width: 560px) {
       .page { padding: 1.5rem 1rem 3rem; }
@@ -127,7 +109,7 @@
 <header class="site-header">
   <a class="logo-area" href="../">
     <span class="uk-mark">AI-DTL</span>
-    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.3</em></span>
+    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.4</em></span>
   </a>
   <div class="lang-switch">
     <button id="btn-de" class="active" onclick="setLang('de')">DE</button>
@@ -138,8 +120,13 @@
 <main class="page">
   <div id="content"></div>
   <footer>
-    <span>AI-DTL Working Draft 0.3 · April 2026</span>
-    <span><a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a></span>
+    <span>AI-DTL Working Draft 0.4 · Juni 2026 · <a href="../changelog/">Changelog</a></span>
+    <span>
+      <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">CC BY 4.0</a> ·
+      DOI folgt (Zenodo) ·
+      <a href="https://github.com/joshuadohmen-sketch/AIDL/issues" target="_blank">Feedback</a> ·
+      <a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a>
+    </span>
   </footer>
 </main>
 
@@ -149,7 +136,6 @@ let lang = 'de';
 
 const T = {
   de: {
-    page_title: 'AI Disclosure & Transparency Label',
     page_sub: 'Dieses Artefakt trägt folgendes AI-DTL-Label:',
     create_own: 'Eigenes Label erstellen',
     create_sub: 'Verwenden Sie den AI-DTL Generator, um ein Label für Ihr Artefakt zu erzeugen.',
@@ -157,25 +143,24 @@ const T = {
     invalid_sub: 'Die URL enthält kein gültiges AI-DTL-Label. Bitte verwenden Sie den Generator.',
     tool_used: 'Verwendetes KI-System',
     dims: {
-      N:     { title: 'Keine KI-Beteiligung', desc: 'Dieses Artefakt wurde vollständig ohne KI-Unterstützung erstellt.' },
-      A:     { title: 'Assistive KI-Nutzung', desc: 'KI wurde ausschließlich für Hilfsfunktionen wie Sprachpolitur, Rechtschreibkorrektur oder Übersetzung eingesetzt.' },
-      S:     { title: 'Supportive KI-Nutzung', desc: 'KI unterstützte beim Brainstorming, bei der Gliederung oder bei der Recherche. Die inhaltliche Gestaltung lag beim Menschen.' },
-      G:     { title: 'Generative KI-Nutzung', desc: 'KI hat substantielle Teile dieses Artefakts erzeugt – Text, Code oder Daten wurden maßgeblich von KI generiert.' },
-      'H:L': { title: 'Lokales Hosting', desc: 'Das KI-System lief lokal auf dem eigenen Rechner. Es wurden keine Daten an externe Server übertragen.' },
-      'H:I': { title: 'Institutionelles Hosting', desc: 'Das KI-System wurde auf einer Hochschul- oder Behördeninstanz betrieben, mit interner Auftragsverarbeitung (AVV).' },
-      'H:C': { title: 'Cloud-Hosting mit AVV', desc: 'Ein kommerzieller Cloud-Dienst wurde genutzt, für den ein Auftragsverarbeitungsvertrag (AVV/DPA) besteht.' },
-      'H:C!':{ title: 'Cloud-Hosting ohne AVV', desc: 'Ein kommerzieller Cloud-Dienst wurde ohne Auftragsverarbeitungsvertrag genutzt. Dies ist in vielen institutionellen Kontexten unzulässig.' },
-      'R:H': { title: 'Menschlich geprüft', desc: 'Die KI-Ausgaben wurden von einem Menschen inhaltlich geprüft, bevor sie übernommen wurden.' },
-      'R:M': { title: 'Maschinell geprüft', desc: 'Die KI-Ausgaben wurden automatisiert geprüft (z.B. durch Linter, Faktenchecker oder Validierungstools).' },
-      'R:HM':{ title: 'Mensch & Maschine geprüft', desc: 'Sowohl ein Mensch als auch automatisierte Systeme haben die KI-Ausgaben geprüft.' },
-      'R:N': { title: 'Keine Prüfung', desc: 'Die KI-Ausgaben wurden ungeprüft und unverändert übernommen. Dies birgt ein erhöhtes Risiko für Fehler und Halluzinationen.' },
-      'Acc:I':{ title: 'Individuelle Verantwortung', desc: 'Eine benennbare Einzelperson (z.B. Autor:in mit ORCID) steht für dieses Artefakt ein.' },
+      N:      { title: 'Keine KI-Beteiligung',         desc: 'Dieses Artefakt wurde vollständig ohne KI-Unterstützung erstellt.' },
+      A:      { title: 'Assistive KI-Nutzung',         desc: 'KI wurde ausschließlich für Hilfsfunktionen wie Sprachpolitur, Rechtschreibkorrektur oder Übersetzung eingesetzt.' },
+      S:      { title: 'Supportive KI-Nutzung',        desc: 'KI unterstützte beim Brainstorming, bei der Gliederung oder bei der Recherche. Die inhaltliche Gestaltung lag beim Menschen.' },
+      G:      { title: 'Generative KI-Nutzung',        desc: 'KI hat substantielle Teile dieses Artefakts erzeugt – Text, Code oder Daten wurden maßgeblich von KI generiert.' },
+      'H:L':  { title: 'Lokales Hosting',              desc: 'Das KI-System lief lokal auf dem eigenen Rechner. Es wurden keine Daten an externe Server übertragen.' },
+      'H:I':  { title: 'Institutionelles Hosting',     desc: 'Das KI-System wurde auf einer Hochschul- oder Behördeninstanz betrieben, mit interner Auftragsverarbeitung (AVV).' },
+      'H:C':  { title: 'Cloud-Hosting mit AVV',        desc: 'Ein kommerzieller Cloud-Dienst wurde genutzt, für den ein Auftragsverarbeitungsvertrag (AVV/DPA) besteht.' },
+      'H:C!': { title: 'Cloud-Hosting ohne AVV',       desc: 'Ein kommerzieller Cloud-Dienst wurde ohne Auftragsverarbeitungsvertrag genutzt. Dies ist in vielen institutionellen Kontexten unzulässig.' },
+      'R:H':  { title: 'Menschlich geprüft',           desc: 'Die KI-Ausgaben wurden von einem Menschen inhaltlich geprüft, bevor sie übernommen wurden.' },
+      'R:M':  { title: 'Maschinell geprüft',           desc: 'Die KI-Ausgaben wurden automatisiert geprüft (z.B. durch Linter, Faktenchecker oder Validierungstools).' },
+      'R:HM': { title: 'Mensch & Maschine geprüft',   desc: 'Sowohl ein Mensch als auch automatisierte Systeme haben die KI-Ausgaben geprüft.' },
+      'R:N':  { title: 'Keine Prüfung',                desc: 'Die KI-Ausgaben wurden ungeprüft und unverändert übernommen. Dies birgt ein erhöhtes Risiko für Fehler und Halluzinationen.' },
+      'Acc:I':{ title: 'Individuelle Verantwortung',   desc: 'Eine benennbare Einzelperson (z.B. Autor:in mit ORCID) steht für dieses Artefakt ein.' },
       'Acc:O':{ title: 'Organisatorische Verantwortung', desc: 'Eine Organisation übernimmt die Verantwortung für dieses Artefakt.' },
       'Acc:N':{ title: 'Keine Verantwortung deklariert', desc: 'Niemand hat die Verantwortung für dieses Artefakt übernommen. Es handelt sich um einen rein agentischen Kontext.' },
     },
   },
   en: {
-    page_title: 'AI Disclosure & Transparency Label',
     page_sub: 'This artefact carries the following AI-DTL label:',
     create_own: 'Create your own label',
     create_sub: 'Use the AI-DTL Generator to create a label for your artefact.',
@@ -183,21 +168,21 @@ const T = {
     invalid_sub: 'This URL does not contain a valid AI-DTL label. Please use the generator.',
     tool_used: 'AI system used',
     dims: {
-      N:     { title: 'No AI involvement', desc: 'This artefact was created entirely without AI assistance.' },
-      A:     { title: 'Assistive AI use', desc: 'AI was used only for auxiliary functions such as language polishing, spell-checking, or translation.' },
-      S:     { title: 'Supportive AI use', desc: 'AI assisted with brainstorming, structuring, or research. The substantive content was created by a human.' },
-      G:     { title: 'Generative AI use', desc: 'AI generated substantial parts of this artefact – text, code, or data were significantly produced by AI.' },
-      'H:L': { title: 'Local hosting', desc: 'The AI system ran locally on the user\'s own machine. No data was transmitted to external servers.' },
-      'H:I': { title: 'Institutional hosting', desc: 'The AI system was operated on a university or authority instance with an internal data processing agreement.' },
-      'H:C': { title: 'Cloud hosting with DPA', desc: 'A commercial cloud service was used under a data processing agreement (DPA).' },
-      'H:C!':{ title: 'Cloud hosting without DPA', desc: 'A commercial cloud service was used without a data processing agreement. This may be unlawful in many institutional contexts.' },
-      'R:H': { title: 'Human reviewed', desc: 'The AI outputs were reviewed by a human before being adopted.' },
-      'R:M': { title: 'Machine reviewed', desc: 'The AI outputs were checked by automated tools (e.g. linters, fact-checkers, or validation tools).' },
-      'R:HM':{ title: 'Human & machine reviewed', desc: 'Both a human and automated systems reviewed the AI outputs.' },
-      'R:N': { title: 'No review', desc: 'The AI outputs were adopted without any review. This carries an elevated risk of errors and hallucinations.' },
-      'Acc:I':{ title: 'Individual accountability', desc: 'A named individual (e.g. author with ORCID) is accountable for this artefact.' },
+      N:      { title: 'No AI involvement',            desc: 'This artefact was created entirely without AI assistance.' },
+      A:      { title: 'Assistive AI use',             desc: 'AI was used only for auxiliary functions such as language polishing, spell-checking, or translation.' },
+      S:      { title: 'Supportive AI use',            desc: 'AI assisted with brainstorming, structuring, or research. The substantive content was created by a human.' },
+      G:      { title: 'Generative AI use',            desc: 'AI generated substantial parts of this artefact – text, code, or data were significantly produced by AI.' },
+      'H:L':  { title: 'Local hosting',               desc: 'The AI system ran locally on the user\'s own machine. No data was transmitted to external servers.' },
+      'H:I':  { title: 'Institutional hosting',       desc: 'The AI system was operated on a university or authority instance with an internal data processing agreement.' },
+      'H:C':  { title: 'Cloud hosting with DPA',      desc: 'A commercial cloud service was used under a data processing agreement (DPA).' },
+      'H:C!': { title: 'Cloud hosting without DPA',   desc: 'A commercial cloud service was used without a data processing agreement. This may be unlawful in many institutional contexts.' },
+      'R:H':  { title: 'Human reviewed',              desc: 'The AI outputs were reviewed by a human before being adopted.' },
+      'R:M':  { title: 'Machine reviewed',            desc: 'The AI outputs were checked by automated tools (e.g. linters, fact-checkers, or validation tools).' },
+      'R:HM': { title: 'Human & machine reviewed',   desc: 'Both a human and automated systems reviewed the AI outputs.' },
+      'R:N':  { title: 'No review',                   desc: 'The AI outputs were adopted without any review. This carries an elevated risk of errors and hallucinations.' },
+      'Acc:I':{ title: 'Individual accountability',   desc: 'A named individual (e.g. author with ORCID) is accountable for this artefact.' },
       'Acc:O':{ title: 'Organizational accountability', desc: 'An organization takes responsibility for this artefact.' },
-      'Acc:N':{ title: 'No accountability claimed', desc: 'Nobody has claimed responsibility for this artefact. This is a purely agentic context.' },
+      'Acc:N':{ title: 'No accountability claimed',   desc: 'Nobody has claimed responsibility for this artefact. This is a purely agentic context.' },
     },
   },
 };
@@ -214,22 +199,27 @@ function setLang(l) {
 
 function parseParams() {
   const p = new URLSearchParams(window.location.search);
+  const tRaw = p.get('t') || '';
+  const dRaw = p.get('d') || '';
   return {
-    stamm: p.get('s'),
-    host: p.get('h'),
+    stamm:  p.get('s'),
+    host:   p.get('h'),
     review: p.get('r'),
-    acc: p.get('a'),
-    tool: p.get('t'),
-    date: p.get('d'),
+    acc:    p.get('a'),
+    tools:  tRaw ? tRaw.split('|') : [],
+    dates:  dRaw ? dRaw.split('|') : [],
   };
 }
 
 function buildLabelString(p) {
   if (!p.stamm || !p.acc) return null;
-  if (p.stamm === 'N') return `AI-DTL 0.3: N;${p.acc}`;
+  if (p.stamm === 'N') return `AI-DTL 0.4: N/${p.acc}`;
   if (!p.host || !p.review) return null;
-  const tool = p.tool ? ` (${p.tool}${p.date ? ', ' + p.date : ''})` : '';
-  return `AI-DTL 0.3: ${p.stamm}/${p.host};${p.review};${p.acc}${tool}`;
+  const toolParts = p.tools
+    .filter(n => n.trim())
+    .map((n, i) => n.trim() + (p.dates[i] ? `, ${p.dates[i]}` : ''));
+  const tool = toolParts.length ? ` (${toolParts.join('; ')})` : '';
+  return `AI-DTL 0.4: ${p.stamm}/${p.host};${p.review};${p.acc}${tool}`;
 }
 
 function renderDimCard(code) {
@@ -262,20 +252,16 @@ function renderPage() {
         <h2>${t.invalid}</h2>
         <p>${t.invalid_sub}</p>
       </div>
-      <div class="cta">
-        <a href="../">${t.create_own}</a>
-      </div>`;
+      <div class="cta"><a href="../">${t.create_own}</a></div>`;
     document.title = 'AI-DTL – ' + t.invalid;
     return;
   }
 
   document.title = 'AI-DTL – ' + label;
 
-  // Build badge
   const state = { stamm: p.stamm, host: p.host, review: p.review, acc: p.acc };
   const badge = buildBadgeSVG(state, label);
 
-  // Dimension cards
   const dims = [p.stamm];
   if (p.stamm !== 'N') {
     if (p.host) dims.push(p.host);
@@ -283,12 +269,11 @@ function renderPage() {
   }
   if (p.acc) dims.push(p.acc);
 
-  const cards = dims.map(renderDimCard).join('');
-
-  // Tool info
   let toolHtml = '';
-  if (p.tool) {
-    toolHtml = `<div class="tool-info"><strong>${t.tool_used}:</strong> ${p.tool}${p.date ? ' (' + p.date + ')' : ''}</div>`;
+  const validTools = p.tools.filter(n => n.trim());
+  if (validTools.length) {
+    const toolList = validTools.map((n, i) => `${n.trim()}${p.dates[i] ? ' (' + p.dates[i] + ')' : ''}`).join('; ');
+    toolHtml = `<div class="tool-info"><strong>${t.tool_used}:</strong> ${toolList}</div>`;
   }
 
   el.innerHTML = `
@@ -297,7 +282,7 @@ function renderPage() {
       ${badge}
       <div class="label-string">${label}</div>
     </div>
-    ${cards}
+    ${dims.map(renderDimCard).join('')}
     ${toolHtml}
     <div class="cta">
       <a href="../">${t.create_own}</a>
