@@ -358,6 +358,145 @@ body {
 .ac-item:hover, .ac-item.active { background: var(--g100); }
 .ac-item b { font-weight: 700; color: var(--red); }
 
+/* ── Multi-select hint ──────────────────────────────────── */
+.multi-hint {
+  font-size: .72rem;
+  color: var(--g400);
+  font-style: italic;
+  margin-top: .6rem;
+  line-height: 1.4;
+}
+
+/* ── ROR / Org section (Acc:O) ──────────────────────────── */
+.ror-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--g200);
+}
+.ror-row {
+  display: flex;
+  gap: .8rem;
+  flex-wrap: wrap;
+}
+.ror-field {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+.ror-field label {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--g700);
+  letter-spacing: .2px;
+}
+.ror-field input {
+  font-family: var(--font);
+  font-size: .88rem;
+  border: 2px solid var(--g200);
+  padding: .6rem .8rem;
+  outline: none;
+  background: var(--g100);
+  border-radius: 4px;
+  color: var(--black);
+  transition: border-color .15s, background .15s;
+  width: 100%;
+}
+.ror-field input:focus {
+  background: var(--white);
+  border-color: var(--red);
+}
+.ror-hint {
+  font-size: .72rem;
+  margin-top: .2rem;
+  min-height: 1em;
+}
+.ror-valid   { color: #2a9d2a; font-weight: 700; }
+.ror-invalid { color: var(--red); }
+
+/* ── Multi-tool rows ────────────────────────────────────── */
+#tools-container {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+.remove-tool-btn {
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 700;
+  background: none;
+  border: 1.5px solid var(--g200);
+  color: var(--g400);
+  width: 38px;
+  height: 38px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-self: center;
+  transition: all .15s;
+  line-height: 1;
+}
+.remove-tool-btn:hover {
+  background: var(--warn-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+.add-tool-btn {
+  font-family: var(--font);
+  font-size: .8rem;
+  font-weight: 600;
+  background: none;
+  border: 1.5px dashed var(--g200);
+  color: var(--g400);
+  padding: .5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: .3rem;
+  width: 100%;
+  text-align: center;
+  transition: all .15s;
+}
+.add-tool-btn:hover {
+  border-color: var(--black);
+  color: var(--black);
+}
+
+/* ── Warning details (collapsible) ─────────────────────── */
+.warn-details {
+  margin-top: .5rem;
+  background: var(--white);
+  border: 1px solid var(--g200);
+  border-radius: 6px;
+  font-size: .8rem;
+}
+.warn-details summary {
+  padding: .7rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--g700);
+  list-style: none;
+  user-select: none;
+}
+.warn-details summary::-webkit-details-marker { display: none; }
+.warn-details summary::before {
+  content: '▶';
+  font-size: .6rem;
+  color: var(--red);
+  margin-right: .5rem;
+  display: inline-block;
+  transition: transform .15s;
+}
+.warn-details[open] summary::before { transform: rotate(90deg); }
+.warn-details-body {
+  padding: .2rem 1rem 1rem;
+  color: var(--g700);
+  line-height: 1.6;
+}
+.warn-details-body ul { padding-left: 1.2rem; }
+.warn-details-body li { margin-bottom: .4rem; }
+
 /* ── Warn banner ─────────────────────────────────────────── */
 .warn-banner {
   background: var(--warn-bg);

@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="logo-area">
     <span class="uk-mark">AI-DTL</span>
-    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.3</em></span>
+    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.4</em></span>
   </div>
   <div class="lang-switch">
     <button id="btn-de" class="active" onclick="setLang('de')">DE</button>
@@ -27,10 +27,10 @@
 
   <div class="page-title">
     <h1 data-i18n="hero_title">AI Disclosure &amp; Transparency Label Generator</h1>
-    <p data-i18n="hero_desc">Generieren Sie ein valides AI-DTL für Ihr Artefakt.</p>
+    <p data-i18n="hero_desc">Generieren Sie ein valides AI-DTL 0.4 für Ihr Artefakt.</p>
   </div>
 
-  <!-- Step 1 -->
+  <!-- Step 1 – Stamm (multi-select) -->
   <div class="step" id="card-stamm">
     <div class="step-header">
       <span class="step-num" data-i18n="step">Schritt 1</span>
@@ -63,12 +63,13 @@
         <span class="dsc" data-i18n="g_dsc">Substantielle Text-, Code- oder Datengenerierung</span>
       </div>
     </div>
+    <p class="multi-hint" data-i18n="s1_hint">Mehrfachauswahl möglich – bei mehreren Stufen zählt die höchste tatsächliche Wirkung.</p>
     <p class="no-ai-hint" id="no-ai-hint" data-i18n="no_ai_hint">
       Bei N entfallen Host, Review und Tool. Bitte noch Accountability auswählen.
     </p>
   </div>
 
-  <!-- Step 2 -->
+  <!-- Step 2 – Host (multi-select) -->
   <div class="step" id="card-host">
     <div class="step-header">
       <span class="step-num" data-i18n="step2">Schritt 2</span>
@@ -101,9 +102,10 @@
         <span class="dsc" data-i18n="hcx_dsc">Ohne AVV – in vielen Kontexten unzulässig</span>
       </div>
     </div>
+    <p class="multi-hint" data-i18n="s2_hint">Mehrfachauswahl möglich – bei mehreren Hosts zählt der am wenigsten geschützte.</p>
   </div>
 
-  <!-- Step 3 -->
+  <!-- Step 3 – Review -->
   <div class="step" id="card-review">
     <div class="step-header">
       <span class="step-num" data-i18n="step3">Schritt 3</span>
@@ -138,7 +140,7 @@
     </div>
   </div>
 
-  <!-- Step 4 -->
+  <!-- Step 4 – Accountability + optional ROR -->
   <div class="step" id="card-acc">
     <div class="step-header">
       <span class="step-num" data-i18n="step4">Schritt 4</span>
@@ -165,35 +167,45 @@
         <span class="dsc" data-i18n="an_dsc">Rein agentischer Raum – kein Mensch steht ein</span>
       </div>
     </div>
+    <div class="ror-section" id="ror-section" style="display:none;">
+      <div class="ror-row">
+        <div class="ror-field">
+          <label for="org-name" data-i18n="org_lbl">Organisation</label>
+          <input id="org-name" type="text" data-i18n-ph="org_ph" autocomplete="off"
+                 aria-label="Organisation" oninput="updateOrg()"/>
+        </div>
+        <div class="ror-field">
+          <label for="ror-id" data-i18n="ror_lbl">ROR-ID (optional)</label>
+          <input id="ror-id" type="text" placeholder="0h2e5c893" autocomplete="off"
+                 aria-label="ROR-ID" oninput="updateROR()"/>
+          <span class="ror-hint" id="ror-hint"></span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Step 5 -->
+  <!-- Step 5 – Multi-tool -->
   <div class="step" id="card-tool">
     <div class="step-header">
       <span class="step-num" data-i18n="step5">Schritt 5</span>
       <h2 data-i18n="s5_title">Tool-Angabe</h2>
     </div>
     <p class="step-sub" data-i18n="s5_sub">Welches KI-System wurde verwendet? Name, Version und Monat der Nutzung.</p>
-    <div class="tool-row">
-      <div class="ac-wrap">
-        <input id="tool-name" type="text" data-i18n-ph="tool_ph" autocomplete="off" />
-        <div class="ac-list" id="ac-list"></div>
-      </div>
-      <div class="dd-wrap" id="dd-month">
-        <button type="button" class="dd-btn placeholder" id="dd-month-btn">Monat</button>
-        <div class="dd-list" id="dd-month-list"></div>
-      </div>
-      <div class="dd-wrap" id="dd-year">
-        <button type="button" class="dd-btn placeholder" id="dd-year-btn">Jahr</button>
-        <div class="dd-list" id="dd-year-list"></div>
-      </div>
-    </div>
+    <div id="tools-container"></div>
+    <button type="button" class="add-tool-btn" id="add-tool-btn"
+            data-i18n="btn_add_tool" onclick="addTool()">+ weiteres Tool</button>
   </div>
 
-  <!-- Warning -->
+  <!-- Warning banner -->
   <div class="warn-banner" id="warn-banner" data-i18n="warn_txt">
     ⚠ Die gewählte Kombination enthält kritische Merkmale. In vielen institutionellen Kontexten ist diese Konfiguration problematisch oder unzulässig.
   </div>
+
+  <!-- Warning details (collapsible) -->
+  <details class="warn-details">
+    <summary data-i18n="warn_when_title">Wann warnt der Generator?</summary>
+    <div class="warn-details-body" data-i18n="warn_when_body"></div>
+  </details>
 
   <!-- Result -->
   <div class="result-block">
@@ -211,14 +223,20 @@
       <button class="copy-btn" data-fmt="meta"   onclick="copyAs('meta')"   data-i18n="btn_meta">HTML &lt;meta&gt;</button>
       <button class="copy-btn" data-fmt="md"     onclick="copyAs('md')"     data-i18n="btn_md">Markdown</button>
       <button class="copy-btn" data-fmt="latex"  onclick="copyAs('latex')"  data-i18n="btn_latex">LaTeX</button>
+      <button class="copy-btn" data-fmt="jsonld" onclick="copyAs('jsonld')" data-i18n="btn_jsonld">JSON-LD</button>
       <button class="copy-btn" data-fmt="link"   onclick="copyAs('link')"   data-i18n="btn_link">Link kopieren</button>
       <button class="copy-btn" onclick="downloadBadge()" data-i18n="btn_badge">Badge ↓ SVG</button>
     </div>
   </div>
 
   <footer>
-    <span>AI-DTL Working Draft 0.3 · April 2026</span>
-    <span><a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a></span>
+    <span>AI-DTL Working Draft 0.4 · Juni 2026 · <a href="changelog/">Changelog</a></span>
+    <span>
+      <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">CC BY 4.0</a> ·
+      DOI folgt (Zenodo) ·
+      <a href="https://github.com/joshuadohmen-sketch/AIDL/issues" target="_blank">Feedback</a> ·
+      <a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a>
+    </span>
   </footer>
 
 </main>
