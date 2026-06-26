@@ -79,16 +79,42 @@ function buildBadgeSVG(state, labelText) {
 
 // Download badge as SVG file
 function downloadBadge() {
-  const el = document.getElementById('badge-container');
-  if (!el || !el.innerHTML.trim()) return;
-  const svg = el.querySelector('svg');
+  const svg = document.querySelector('#badge-container svg');
   if (!svg) return;
   const data = new XMLSerializer().serializeToString(svg);
   const blob = new Blob([data], { type: 'image/svg+xml' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'dtl-badge.svg';
-  a.click();
+  a.href = url; a.download = 'dtl-badge.svg'; a.click();
   URL.revokeObjectURL(url);
+}
+
+// Download badge as PNG (3× scale via canvas)
+function downloadBadgePNG() {
+  const svg = document.querySelector('#badge-container svg');
+  if (!svg) return;
+  const vb = svg.viewBox.baseVal;
+  const w = vb.width, h = vb.height, scale = 3;
+  let src = new XMLSerializer().serializeToString(svg);
+  src = src.replace(/\bwidth="[^"]*"/, `width="${w}" height="${h}"`);
+  const blob = new Blob([src], { type: 'image/svg+xml;charset=utf-8' });
+  const svgUrl = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = w * scale; canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0);
+    canvas.toBlob(pngBlob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(pngBlob);
+      a.download = 'dtl-badge.png'; a.click();
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+    URL.revokeObjectURL(svgUrl);
+  };
+  img.src = svgUrl;
 }

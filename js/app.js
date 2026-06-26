@@ -4,8 +4,6 @@ const S = {
   host:  [],
   review: null,
   acc: null,
-  org: '',
-  ror: '',
   tools: [{ name: '', month: '', year: '' }]
 };
 let lang = 'de';
@@ -51,8 +49,6 @@ const T = {
     ai_lbl: 'Individual',      ai_dsc: 'Benennbare Einzelperson (z.B. Autor:in mit ORCID)',
     ao_lbl: 'Organizational',  ao_dsc: 'Organisation übernimmt Verantwortung',
     an_lbl: 'None claimed',    an_dsc: 'Rein agentischer Raum – kein Mensch steht ein',
-    org_lbl: 'Organisation', org_ph: 'z.B. Universität Koblenz',
-    ror_lbl: 'ROR-ID (optional)', ror_ph: '0h2e5c893', ror_invalid: 'Ungültiges Format',
     tool_ph: 'z.B. Claude Opus 4.6', tool_aria: 'KI-Tool Name',
     btn_add_tool: '+ weiteres Tool', remove_tool_aria: 'Tool entfernen',
     warn_txt: '⚠ Die gewählte Kombination enthält kritische Merkmale. In vielen institutionellen Kontexten ist diese Konfiguration problematisch oder unzulässig.',
@@ -61,7 +57,8 @@ const T = {
     result_label: 'Ihr AI-DTL-Label',
     result_ph: 'Bitte alle Felder ausfüllen …',
     btn_text: 'Text kopieren', btn_meta: 'HTML &lt;meta&gt;', btn_md: 'Markdown',
-    btn_latex: 'LaTeX', btn_link: 'Link kopieren', btn_jsonld: 'JSON-LD', btn_badge: 'Badge ↓ SVG',
+    btn_latex: 'LaTeX', btn_link: 'Link kopieren', btn_jsonld: 'JSON-LD',
+    btn_badge: 'Badge ↓ SVG', btn_png: 'Badge ↓ PNG',
     no_ai_hint: 'Bei N entfallen Host, Review und Tool. Bitte Accountability auswählen.',
     month_ph: 'Monat', year_ph: 'Jahr',
     months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
@@ -98,8 +95,6 @@ const T = {
     ai_lbl: 'Individual',      ai_dsc: 'Named individual (e.g. author with ORCID)',
     ao_lbl: 'Organizational',  ao_dsc: 'Organization takes responsibility',
     an_lbl: 'None claimed',    an_dsc: 'Purely agentic context – no human stands behind this',
-    org_lbl: 'Organisation', org_ph: 'e.g. University of Koblenz',
-    ror_lbl: 'ROR ID (optional)', ror_ph: '0h2e5c893', ror_invalid: 'Invalid format',
     tool_ph: 'e.g. Claude Opus 4.6', tool_aria: 'AI tool name',
     btn_add_tool: '+ add tool', remove_tool_aria: 'Remove tool',
     warn_txt: '⚠ This combination contains critical markers. In many institutional contexts this configuration may be problematic or unlawful.',
@@ -108,7 +103,8 @@ const T = {
     result_label: 'Your AI-DTL Label',
     result_ph: 'Please complete all fields …',
     btn_text: 'Copy text', btn_meta: 'HTML &lt;meta&gt;', btn_md: 'Markdown',
-    btn_latex: 'LaTeX', btn_link: 'Copy link', btn_jsonld: 'JSON-LD', btn_badge: 'Badge ↓ SVG',
+    btn_latex: 'LaTeX', btn_link: 'Copy link', btn_jsonld: 'JSON-LD',
+    btn_badge: 'Badge ↓ SVG', btn_png: 'Badge ↓ PNG',
     no_ai_hint: 'For N, Host, Review and Tool are omitted. Please select Accountability.',
     month_ph: 'Month', year_ph: 'Year',
     months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
@@ -186,12 +182,6 @@ function pick(el) {
     document.querySelectorAll('.opt[data-dim="review"]').forEach(o => o.classList.remove('selected'));
   }
 
-  if (dim === 'acc') {
-    const show = val === 'Acc:O';
-    document.getElementById('ror-section').style.display = show ? 'block' : 'none';
-    if (!show) { S.org = ''; S.ror = ''; }
-  }
-
   updateStepStates();
   render();
 }
@@ -211,32 +201,6 @@ function updateStepStates() {
     const num = el.querySelector('.step-num');
     if (num) num.classList.toggle('done', s.done);
   });
-}
-
-// ── ROR / Org fields (shown only when Acc:O selected)
-function updateOrg() {
-  S.org = document.getElementById('org-name').value.trim();
-  render();
-}
-
-function updateROR() {
-  const raw = document.getElementById('ror-id').value.trim();
-  const hint = document.getElementById('ror-hint');
-  const urlM = raw.match(/ror\.org\/?([0-9][a-z0-9]{8})/i);
-  const idM  = raw.match(/^([0-9][a-z0-9]{8})$/i);
-  if (urlM) {
-    S.ror = urlM[1].toLowerCase();
-    hint.textContent = '✓'; hint.className = 'ror-hint ror-valid';
-  } else if (idM) {
-    S.ror = idM[1].toLowerCase();
-    hint.textContent = '✓'; hint.className = 'ror-hint ror-valid';
-  } else if (raw.length > 0) {
-    S.ror = '';
-    hint.textContent = T[lang].ror_invalid; hint.className = 'ror-hint ror-invalid';
-  } else {
-    S.ror = ''; hint.textContent = ''; hint.className = 'ror-hint';
-  }
-  render();
 }
 
 // ── Label construction
@@ -321,14 +285,6 @@ function copyAs(type) {
     return;
   }
   const url = buildLabelURL();
-  const rorUrl = S.acc === 'Acc:O' && S.ror ? `https://ror.org/${S.ror}` : '';
-  let orgLine = '';
-  if (S.acc === 'Acc:O' && S.org) {
-    orgLine = lang === 'de'
-      ? `Verantwortlich: ${S.org}${rorUrl ? ' (ROR: ' + rorUrl + ')' : ''}`
-      : `Accountable: ${S.org}${rorUrl ? ' (ROR: ' + rorUrl + ')' : ''}`;
-  }
-
   const jsonld = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
@@ -336,15 +292,14 @@ function copyAs(type) {
       '@type': 'PropertyValue',
       name: 'AI-DTL',
       value: label,
-      ...(rorUrl ? { propertyID: rorUrl } : {})
     }
   }, null, 2);
 
   const map = {
-    plain:  (url ? `${label}\n${url}` : label) + (orgLine ? `\n${orgLine}` : ''),
+    plain:  url ? `${label}\n${url}` : label,
     meta:   `<meta name="ai-dtl" content="${label}">\n<!-- ${url || ''} -->`,
-    md:     (url ? `> [${label}](${url})` : `> ${label}`) + (orgLine ? `\n*${orgLine}*` : ''),
-    latex:  (url ? `\\href{${url}}{\\texttt{${label}}}` : `\\texttt{${label}}`) + (orgLine ? `\n% ${orgLine}` : ''),
+    md:     url ? `> [${label}](${url})` : `> ${label}`,
+    latex:  url ? `\\href{${url}}{\\texttt{${label}}}` : `\\texttt{${label}}`,
     link:   url || label,
     jsonld,
   };

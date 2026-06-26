@@ -167,21 +167,6 @@
         <span class="dsc" data-i18n="an_dsc">Rein agentischer Raum – kein Mensch steht ein</span>
       </div>
     </div>
-    <div class="ror-section" id="ror-section" style="display:none;">
-      <div class="ror-row">
-        <div class="ror-field">
-          <label for="org-name" data-i18n="org_lbl">Organisation</label>
-          <input id="org-name" type="text" data-i18n-ph="org_ph" autocomplete="off"
-                 aria-label="Organisation" oninput="updateOrg()"/>
-        </div>
-        <div class="ror-field">
-          <label for="ror-id" data-i18n="ror_lbl">ROR-ID (optional)</label>
-          <input id="ror-id" type="text" placeholder="0h2e5c893" autocomplete="off"
-                 aria-label="ROR-ID" oninput="updateROR()"/>
-          <span class="ror-hint" id="ror-hint"></span>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Step 5 – Multi-tool -->
@@ -225,7 +210,8 @@
       <button class="copy-btn" data-fmt="latex"  onclick="copyAs('latex')"  data-i18n="btn_latex">LaTeX</button>
       <button class="copy-btn" data-fmt="jsonld" onclick="copyAs('jsonld')" data-i18n="btn_jsonld">JSON-LD</button>
       <button class="copy-btn" data-fmt="link"   onclick="copyAs('link')"   data-i18n="btn_link">Link kopieren</button>
-      <button class="copy-btn" onclick="downloadBadge()" data-i18n="btn_badge">Badge ↓ SVG</button>
+      <button class="copy-btn" onclick="downloadBadge()"    data-i18n="btn_badge">Badge ↓ SVG</button>
+      <button class="copy-btn" onclick="downloadBadgePNG()" data-i18n="btn_png">Badge ↓ PNG</button>
     </div>
   </div>
 
