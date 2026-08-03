@@ -54,13 +54,28 @@ function buildBadgeSVG(state, labelText) {
   const gap = 56;
   const padX = 20;
   const padY = 14;
-  const totalW = padX * 2 + (dims.length - 1) * gap + r * 2;
+  // EU prefix: same circle size, then a thin divider, then dimension circles
+  const euGap = 66;
+  const euCX = padX + r;
+  const cy = padY + r;
+  const dimStartX = euCX + euGap;
+  const totalW = dimStartX + (dims.length - 1) * gap + r + padX;
   const h = r * 2 + padY + 26;
+  const divX = euCX + r + 12;
 
-  let circles = '';
+  let circles = `
+    <circle cx="${euCX}" cy="${cy}" r="${r}" fill="#000000"/>
+    <text x="${euCX}" y="${cy + 6}" text-anchor="middle"
+          font-family="Arial Black, Arial, sans-serif" font-size="15" font-weight="900"
+          fill="#ffffff">AI</text>
+    <text x="${euCX}" y="${cy + r + 14}" text-anchor="middle"
+          font-family="'Courier New',monospace" font-size="10" font-weight="700"
+          fill="#999">EU</text>
+    <line x1="${divX}" y1="${padY + 4}" x2="${divX}" y2="${padY + r * 2 - 4}"
+          stroke="#cccccc" stroke-width="1"/>`;
+
   dims.forEach((d, i) => {
-    const cx = padX + r + i * gap;
-    const cy = padY + r;
+    const cx = dimStartX + i * gap;
     const isWarn = d.code === 'H:C!' || d.code === 'R:N' || d.code === 'Acc:N';
     const fill = isWarn ? '#c61a27' : '#000000';
     const iconPaths = (ICONS[d.key] || '').replace(/currentColor/g, '#ffffff');
