@@ -190,6 +190,17 @@ function pick(el) {
     document.querySelectorAll('.opt[data-dim="review"]').forEach(o => o.classList.remove('selected'));
   }
 
+  // Acc:N is only valid when AI was used; hide it (and clear it) when stamm is N
+  const accNEl = document.querySelector('.opt[data-dim="acc"][data-val="Acc:N"]');
+  if (accNEl) {
+    const hideAccN = onlyN;
+    accNEl.classList.toggle('hide', hideAccN);
+    if (hideAccN && S.acc === 'Acc:N') {
+      S.acc = null;
+      accNEl.classList.remove('selected');
+    }
+  }
+
   updateStepStates();
   render();
 }
