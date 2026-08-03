@@ -157,6 +157,14 @@ function pick(el) {
       el.classList.remove('selected');
       S[dim] = S[dim].filter(v => v !== val);
     } else {
+      // N and A/S/G are mutually exclusive within stamm
+      if (dim === 'stamm') {
+        const toDeselect = val === 'N' ? ['A','S','G'] : ['N'];
+        toDeselect.forEach(v => {
+          document.querySelector(`.opt[data-dim="stamm"][data-val="${v}"]`)?.classList.remove('selected');
+          S.stamm = S.stamm.filter(x => x !== v);
+        });
+      }
       el.classList.add('selected');
       if (!S[dim].includes(val)) S[dim].push(val);
     }
