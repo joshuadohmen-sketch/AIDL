@@ -134,73 +134,12 @@
 </main>
 
 <script src="../js/icons.js"></script>
+<script src="../js/spec.js"></script>
+<script src="../js/label-core.js"></script>
 <script>
+// Explanation page 0.4.1. Texts from js/spec.js, parsing and checks from js/label-core.js.
+// Everything taken from the URL is set as text; codes come only from the positive list.
 let lang = 'de';
-
-const T = {
-  de: {
-    page_sub: 'Dieses Artefakt trägt folgendes AI-DTL-Label:',
-    create_own: 'Eigenes Label erstellen',
-    create_sub: 'Verwenden Sie den AI-DTL Generator, um ein Label für Ihr Artefakt zu erzeugen.',
-    invalid: 'Ungültiges Label',
-    invalid_sub: 'Die URL enthält kein gültiges AI-DTL-Label. Bitte verwenden Sie den Generator.',
-    tool_used: 'Verwendetes KI-System',
-    legacy_n_accn: 'Diese Kombination ist seit Version 0.4 nicht mehr vorgesehen.',
-    dims: {
-      N:      { title: 'Keine KI-Beteiligung',         desc: 'Dieses Artefakt wurde vollständig ohne KI-Unterstützung erstellt.' },
-      A:      { title: 'Assistive KI-Nutzung',         desc: 'KI wurde ausschließlich für Hilfsfunktionen wie Sprachpolitur, Rechtschreibkorrektur oder Übersetzung eingesetzt.' },
-      S:      { title: 'Supportive KI-Nutzung',        desc: 'KI unterstützte beim Brainstorming, bei der Gliederung oder bei der Recherche. Die inhaltliche Gestaltung lag beim Menschen.' },
-      G:      { title: 'Generative KI-Nutzung',        desc: 'KI hat substantielle Teile dieses Artefakts erzeugt – Text, Code oder Daten wurden maßgeblich von KI generiert.' },
-      'H:L':  { title: 'Lokales Hosting',              desc: 'Das KI-System lief lokal auf dem eigenen Rechner. Es wurden keine Daten an externe Server übertragen.' },
-      'H:I':  { title: 'Institutionelles Hosting',     desc: 'Das KI-System wurde auf einer Hochschul- oder Behördeninstanz betrieben, mit interner Auftragsverarbeitung (AVV).' },
-      'H:C':  { title: 'Cloud-Hosting mit AVV',        desc: 'Ein kommerzieller Cloud-Dienst wurde genutzt, für den ein Auftragsverarbeitungsvertrag (AVV/DPA) besteht.' },
-      'H:C!': { title: 'Cloud-Hosting ohne AVV',       desc: 'Ein kommerzieller Cloud-Dienst wurde ohne Auftragsverarbeitungsvertrag genutzt. Dies ist in vielen institutionellen Kontexten unzulässig.' },
-      'R:H':  { title: 'Menschlich geprüft',           desc: 'Die KI-Ausgaben wurden von einem Menschen inhaltlich geprüft, bevor sie übernommen wurden.' },
-      'R:M':  { title: 'Maschinell geprüft',           desc: 'Die KI-Ausgaben wurden automatisiert geprüft (z.B. durch Linter, Faktenchecker oder Validierungstools).' },
-      'R:HM': { title: 'Mensch & Maschine geprüft',   desc: 'Sowohl ein Mensch als auch automatisierte Systeme haben die KI-Ausgaben geprüft.' },
-      'R:N':  { title: 'Keine Prüfung',                desc: 'Die KI-Ausgaben wurden ungeprüft und unverändert übernommen. Dies birgt ein erhöhtes Risiko für Fehler und Halluzinationen.' },
-      'Acc:I':{ title: 'Individuelle Verantwortung',   desc: 'Eine benennbare Einzelperson (z.B. Autor:in mit ORCID) steht für dieses Artefakt ein.' },
-      'Acc:O':{ title: 'Organisatorische Verantwortung', desc: 'Eine Organisation übernimmt die Verantwortung für dieses Artefakt.' },
-      'Acc:N':{ title: 'Keine Verantwortung deklariert', desc: 'Niemand hat die Verantwortung für dieses Artefakt übernommen. Es handelt sich um einen rein agentischen Kontext.' },
-    },
-  },
-  en: {
-    page_sub: 'This artefact carries the following AI-DTL label:',
-    create_own: 'Create your own label',
-    create_sub: 'Use the AI-DTL Generator to create a label for your artefact.',
-    invalid: 'Invalid label',
-    invalid_sub: 'This URL does not contain a valid AI-DTL label. Please use the generator.',
-    tool_used: 'AI system used',
-    legacy_n_accn: 'This combination is no longer intended since version 0.4.',
-    dims: {
-      N:      { title: 'No AI involvement',            desc: 'This artefact was created entirely without AI assistance.' },
-      A:      { title: 'Assistive AI use',             desc: 'AI was used only for auxiliary functions such as language polishing, spell-checking, or translation.' },
-      S:      { title: 'Supportive AI use',            desc: 'AI assisted with brainstorming, structuring, or research. The substantive content was created by a human.' },
-      G:      { title: 'Generative AI use',            desc: 'AI generated substantial parts of this artefact – text, code, or data were significantly produced by AI.' },
-      'H:L':  { title: 'Local hosting',               desc: 'The AI system ran locally on the user\'s own machine. No data was transmitted to external servers.' },
-      'H:I':  { title: 'Institutional hosting',       desc: 'The AI system was operated on a university or authority instance with an internal data processing agreement.' },
-      'H:C':  { title: 'Cloud hosting with DPA',      desc: 'A commercial cloud service was used under a data processing agreement (DPA).' },
-      'H:C!': { title: 'Cloud hosting without DPA',   desc: 'A commercial cloud service was used without a data processing agreement. This may be unlawful in many institutional contexts.' },
-      'R:H':  { title: 'Human reviewed',              desc: 'The AI outputs were reviewed by a human before being adopted.' },
-      'R:M':  { title: 'Machine reviewed',            desc: 'The AI outputs were checked by automated tools (e.g. linters, fact-checkers, or validation tools).' },
-      'R:HM': { title: 'Human & machine reviewed',   desc: 'Both a human and automated systems reviewed the AI outputs.' },
-      'R:N':  { title: 'No review',                   desc: 'The AI outputs were adopted without any review. This carries an elevated risk of errors and hallucinations.' },
-      'Acc:I':{ title: 'Individual accountability',   desc: 'A named individual (e.g. author with ORCID) is accountable for this artefact.' },
-      'Acc:O':{ title: 'Organizational accountability', desc: 'An organization takes responsibility for this artefact.' },
-      'Acc:N':{ title: 'No accountability claimed',   desc: 'Nobody has claimed responsibility for this artefact. This is a purely agentic context.' },
-    },
-  },
-};
-
-// Positive list for 0.4. Anything else is rejected without echoing the input.
-const CODES = {
-  stamm:  ['N', 'A', 'S', 'G'],
-  host:   ['H:L', 'H:I', 'H:C', 'H:C!'],
-  review: ['R:H', 'R:M', 'R:HM', 'R:N'],
-  acc:    ['Acc:I', 'Acc:O', 'Acc:N'],
-};
-const TOOL_DISPLAY_MAX = 200;
-const DATE_RE = /^(0[1-9]|1[0-2])\/\d{4}$/;
 
 function setLang(l) {
   lang = l;
@@ -208,40 +147,6 @@ function setLang(l) {
   document.getElementById('btn-en').classList.toggle('active', l === 'en');
   document.documentElement.lang = l;
   renderPage();
-}
-
-// Returns a validated label state, or null if any code is not on the positive list.
-// Tool names are never rejected; they are only shortened for display and set as text.
-function parseParams() {
-  const p = new URLSearchParams(window.location.search);
-  const stamm = p.get('s'), acc = p.get('a');
-  if (!CODES.stamm.includes(stamm) || !CODES.acc.includes(acc)) return null;
-  if (stamm === 'N') {
-    return { stamm, acc, host: null, review: null, tools: [], legacyNAccN: acc === 'Acc:N' };
-  }
-  const host = p.get('h'), review = p.get('r');
-  if (!CODES.host.includes(host) || !CODES.review.includes(review)) return null;
-
-  const tRaw = p.get('t') || '';
-  const dRaw = p.get('d') || '';
-  const names = tRaw ? tRaw.split('|') : [];
-  const dates = dRaw ? dRaw.split('|') : [];
-  const tools = names
-    .map((n, i) => {
-      let name = n.trim();
-      if (name.length > TOOL_DISPLAY_MAX) name = name.slice(0, TOOL_DISPLAY_MAX) + '…';
-      const d = (dates[i] || '').trim();
-      return { name, date: DATE_RE.test(d) ? d : '' };
-    })
-    .filter(tool => tool.name);
-  return { stamm, acc, host, review, tools, legacyNAccN: false };
-}
-
-function buildLabelString(p) {
-  if (p.stamm === 'N') return `AI-DTL 0.4: N/${p.acc}`;
-  const toolParts = p.tools.map(tool => tool.name + (tool.date ? `, ${tool.date}` : ''));
-  const tool = toolParts.length ? ` (${toolParts.join('; ')})` : '';
-  return `AI-DTL 0.4: ${p.stamm}/${p.host};${p.review};${p.acc}${tool}`;
 }
 
 // Small DOM helper: el('div', { className: 'x' }, child, 'text', …)
@@ -252,8 +157,7 @@ function el(tag, props, ...children) {
   return node;
 }
 
-function renderDimCard(code) {
-  const t = T[lang].dims[code];
+function renderDimCard(t, code) {
   const icon = el('div', { className: 'dim-icon' });
   // ICONS is a fixed in-page table and code is from the positive list
   icon.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">${ICONS[code].replace(/currentColor/g, '#ffffff')}</svg>`;
@@ -261,45 +165,51 @@ function renderDimCard(code) {
     icon,
     el('div', { className: 'dim-body' },
       el('div', { className: 'dim-code' }, code),
-      el('div', { className: 'dim-title' }, t.title),
-      el('div', { className: 'dim-desc' }, t.desc)));
+      el('div', { className: 'dim-title' }, t.dims[code].title),
+      el('div', { className: 'dim-desc' }, t.dims[code].desc)));
 }
 
 function renderPage() {
-  const p = parseParams();
-  const t = T[lang];
+  // This page shows 0.4 labels; 0.5 labels live under rc/label/ until release.
+  const parsed = LabelCore.fromParams(new URLSearchParams(window.location.search));
+  const p = parsed && parsed.v === '0.4' ? parsed : null;
+  const t = SPEC['0.4'].i18n[lang];
   const root = document.getElementById('content');
-  const cta = (withSub) => el('div', { className: 'cta' },
-    el('a', { href: '../' }, t.create_own),
-    withSub ? el('p', {}, t.create_sub) : null);
+  const cta = withSub => el('div', { className: 'cta' },
+    el('a', { href: '../' }, t.page.create_own),
+    withSub ? el('p', {}, t.page.create_sub) : null);
 
   if (!p) {
     root.replaceChildren(
-      el('div', { className: 'error' }, el('h2', {}, t.invalid), el('p', {}, t.invalid_sub)),
+      el('div', { className: 'error' }, el('h2', {}, t.page.invalid), el('p', {}, t.page.invalid_sub)),
       cta(false));
-    document.title = 'AI-DTL – ' + t.invalid;
+    document.title = 'AI-DTL – ' + t.page.invalid;
     return;
   }
 
-  const label = buildLabelString(p);
+  const s = p.state;
+  // Old links may lack dates or carry N/Acc:N, so the code is assembled for display here.
+  const toolPart = s.tools.length ? ` (${s.tools.map(x => x.name + (x.date ? `, ${x.date}` : '')).join('; ')})` : '';
+  const label = s.stamm === 'N'
+    ? `AI-DTL 0.4: N/${s.acc}`
+    : `AI-DTL 0.4: ${s.stamm}/${s.host};${s.review};${s.acc}${toolPart}`;
   document.title = 'AI-DTL – ' + label;
 
   const badge = el('div');
-  badge.innerHTML = buildBadgeSVG({ stamm: p.stamm, host: p.host, review: p.review, acc: p.acc }, '0.4');
+  badge.innerHTML = buildBadgeSVG(s, '0.4');
 
-  const dims = p.stamm === 'N' ? [p.stamm, p.acc] : [p.stamm, p.host, p.review, p.acc];
-
+  const dims = s.stamm === 'N' ? [s.stamm, s.acc] : [s.stamm, s.host, s.review, s.acc];
   const nodes = [
     el('div', { className: 'badge-hero' },
-      el('p', { className: 'page-sub' }, t.page_sub),
+      el('p', { className: 'page-sub' }, t.page.page_sub),
       badge,
       el('div', { className: 'label-string' }, label)),
   ];
-  if (p.legacyNAccN) nodes.push(el('div', { className: 'legacy-note' }, t.legacy_n_accn));
-  dims.forEach(code => nodes.push(renderDimCard(code)));
-  if (p.tools.length) {
-    const list = p.tools.map(tool => tool.name + (tool.date ? ` (${tool.date})` : '')).join('; ');
-    nodes.push(el('div', { className: 'tool-info' }, el('strong', {}, t.tool_used + ':'), ' ' + list));
+  if (p.legacyNAccN) nodes.push(el('div', { className: 'legacy-note' }, t.page.legacy_n_accn));
+  dims.forEach(code => nodes.push(renderDimCard(t, code)));
+  if (s.tools.length) {
+    const list = s.tools.map(x => x.name + (x.date ? ` (${x.date})` : '')).join('; ');
+    nodes.push(el('div', { className: 'tool-info' }, el('strong', {}, t.page.tool_used + ':'), ' ' + list));
   }
   nodes.push(cta(true));
   root.replaceChildren(...nodes);

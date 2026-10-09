@@ -1,0 +1,8 @@
+{
+  "name": "ai-dtl",
+  "private": true,
+  "description": "AI Disclosure & Transparency Label – editor and explanation page (static site, no build step)",
+  "scripts": {
+    "test": "node --test"
+  }
+}
