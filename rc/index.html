@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-DTL – KI-Nutzung offenlegen (Vorschau 0.5)</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#editor" data-t="ui.skip">Zum Editor springen</a>
+
+<header class="site-header">
+  <a class="logo-area" href="./">
+    <span class="uk-mark">AI-DTL</span>
+    <span class="header-sub" data-t="ui.header_version">v 0.5 (Vorschau)</span>
+  </a>
+  <div class="lang-switch" role="group" aria-label="Sprache / Language">
+    <button type="button" id="btn-de" lang="de" aria-pressed="true">DE</button>
+    <button type="button" id="btn-en" lang="en" aria-pressed="false">EN</button>
+  </div>
+</header>
+
+<div class="study-banner" id="study-banner" hidden></div>
+
+<main class="page" id="main">
+
+  <div class="page-title">
+    <h1 data-t="ui.title">AI-DTL – KI-Nutzung offenlegen</h1>
+    <p data-t="ui.subtitle">In fünf Schritten zu einem Label aus Klartextsatz und Code.</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="example-pick" id="example-wrap">
+      <label for="example-select" data-t="ui.example">Beispiel laden</label>
+      <select id="example-select"></select>
+    </div>
+    <button type="button" class="btn-secondary" id="restart-btn" data-t="ui.restart">Neu beginnen</button>
+  </div>
+
+  <p class="notice" id="legacy-notice" role="status" hidden></p>
+
+  <form id="editor" class="steps" novalidate>
+
+    <!-- 1 · Was hat die KI gemacht? -->
+    <fieldset class="step" id="step-stamm">
+      <legend><span class="step-num"></span><span class="step-title" data-t="steps.stamm.title"></span></legend>
+      <p class="step-sub" data-t="steps.stamm.sub"></p>
+      <p class="select-note"><span class="note-mark square" aria-hidden="true"></span><span data-t="ui.multi"></span></p>
+      <div class="opts" data-dim="stamm"></div>
+      <p class="cumul" id="cumul-stamm" aria-live="polite"></p>
+      <details class="helper" id="helper">
+        <summary data-t="helper.title"></summary>
+        <div class="helper-body" id="helper-body" aria-live="polite"></div>
+      </details>
+      <div class="field" id="field-purpose">
+        <label for="purpose" data-t="purpose.label"></label>
+        <input type="text" id="purpose" maxlength="120" autocomplete="off" aria-describedby="purpose-help">
+        <small id="purpose-help" data-t="purpose.help"></small>
+      </div>
+      <p class="hint" id="no-ai-hint" data-t="no_ai_hint" hidden></p>
+    </fieldset>
+
+    <!-- 2 · Welche KI-Werkzeuge? -->
+    <fieldset class="step" id="step-tools">
+      <legend><span class="step-num"></span><span class="step-title" data-t="steps.tools.title"></span></legend>
+      <p class="step-sub" data-t="steps.tools.sub"></p>
+      <div id="tools-container"></div>
+      <button type="button" class="add-tool-btn" id="add-tool-btn" data-t="tools.add"></button>
+      <div class="tool-hints" id="tool-hints" aria-live="polite"></div>
+    </fieldset>
+
+    <!-- 3 · Auf wessen Rechnern lief die KI? -->
+    <fieldset class="step" id="step-host">
+      <legend><span class="step-num"></span><span class="step-title" data-t="steps.host.title"></span></legend>
+      <p class="step-sub" data-t="steps.host.sub"></p>
+      <p class="select-note"><span class="note-mark square" aria-hidden="true"></span><span data-t="ui.multi"></span></p>
+      <div class="opts" data-dim="host"></div>
+      <p class="cumul" id="cumul-host" aria-live="polite"></p>
+      <p class="hint" data-t="host_hint"></p>
+    </fieldset>
+
+    <!-- 4 · Wurden die KI-Ausgaben geprüft? -->
+    <fieldset class="step" id="step-review">
+      <legend><span class="step-num"></span><span class="step-title" data-t="steps.review.title"></span></legend>
+      <p class="select-note"><span class="note-mark round" aria-hidden="true"></span><span data-t="ui.single"></span></p>
+      <div class="opts" data-dim="review"></div>
+      <p class="hint" id="review-hint" data-t="review_hint_as" hidden></p>
+    </fieldset>
+
+    <!-- 5 · Wer steht für das Werk ein? -->
+    <fieldset class="step" id="step-acc">
+      <legend><span class="step-num"></span><span class="step-title" data-t="steps.acc.title"></span></legend>
+      <p class="step-sub" data-t="steps.acc.sub"></p>
+      <p class="select-note"><span class="note-mark round" aria-hidden="true"></span><span data-t="ui.single"></span></p>
+      <div class="opts" data-dim="acc"></div>
+      <div class="field" id="field-resp">
+        <label for="resp" data-t="resp.label"></label>
+        <input type="text" id="resp" maxlength="120" autocomplete="off" aria-describedby="resp-help">
+        <small id="resp-help" data-t="resp.help"></small>
+      </div>
+    </fieldset>
+
+  </form>
+
+  <!-- Art. 50 -->
+  <details class="art50" id="art50" hidden>
+    <summary data-t="art50.title"></summary>
+    <div class="art50-body">
+      <p id="art50-question" data-t="art50.question"></p>
+      <div class="answers" role="radiogroup" aria-labelledby="art50-question">
+        <label><input type="radio" name="art50" value="yes"> <span data-t="ui.yes"></span></label>
+        <label><input type="radio" name="art50" value="no"> <span data-t="ui.no"></span></label>
+        <label><input type="radio" name="art50" value="unknown"> <span data-t="ui.dont_know"></span></label>
+      </div>
+      <div class="art50-answer" id="art50-answer" aria-live="polite"></div>
+    </div>
+  </details>
+
+  <!-- Result -->
+  <section class="result-block" id="result" aria-labelledby="result-title">
+    <h2 id="result-title" data-t="ui.result_title"></h2>
+    <div class="missing" id="missing" aria-live="polite"></div>
+    <div id="result-body" hidden>
+      <p class="sentence" id="sentence"></p>
+      <p class="code-line"><a id="code-link" class="code-link" target="_blank" rel="noopener"></a></p>
+      <div id="badge-container"></div>
+    </div>
+    <div class="hints" id="hints" aria-live="polite"></div>
+    <details class="warn-details">
+      <summary data-t="ui.when_title"></summary>
+      <div class="warn-details-body" id="when-body"></div>
+    </details>
+    <p class="part-label" data-t="ui.part_label"></p>
+    <button type="button" class="study-copy" id="study-copy" data-t="ui.study_copy" hidden></button>
+    <div class="copy-row" id="copy-row">
+      <button type="button" class="copy-btn" data-fmt="text"   data-t="ui.btn_text"></button>
+      <button type="button" class="copy-btn" data-fmt="html"   data-t="ui.btn_html"></button>
+      <button type="button" class="copy-btn" data-fmt="md"     data-t="ui.btn_md"></button>
+      <button type="button" class="copy-btn" data-fmt="latex"  data-t="ui.btn_latex"></button>
+      <button type="button" class="copy-btn" data-fmt="link"   data-t="ui.btn_link"></button>
+      <button type="button" class="copy-btn" data-fmt="speech" data-t="ui.btn_speech"></button>
+      <button type="button" class="copy-btn" data-fmt="svg"    data-t="ui.btn_svg"></button>
+      <button type="button" class="copy-btn" data-fmt="png"    data-t="ui.btn_png"></button>
+    </div>
+    <p class="copy-status" id="copy-status" role="status"></p>
+  </section>
+
+  <footer>
+    <span>AI-DTL Working Draft 0.5 (Vorschau) · <a href="https://joshuadohmen-sketch.github.io/AIDL/changelog/">Changelog</a></span>
+    <span class="footer-test" data-t="ui.footer_test"></span>
+    <span>
+      <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> ·
+      <span data-t="ui.doi">DOI folgt (Zenodo)</span> ·
+      <a href="https://github.com/joshuadohmen-sketch/AIDL/issues">Feedback</a> ·
+      <a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a>
+    </span>
+  </footer>
+
+</main>
+
+<script src="js/spec.js"></script>
+<script src="js/label-core.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/services.js"></script>
+<script src="js/examples.js"></script>
+<script src="js/editor.js"></script>
+</body>
+</html>

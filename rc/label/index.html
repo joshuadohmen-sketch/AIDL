@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-DTL Label</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .label-hero { margin-bottom: 1.25rem; background: var(--white); border: 1px solid var(--g200); border-radius: 8px; padding: 1.75rem 1.5rem; }
+    .label-hero .sentence { font-size: 1.3rem; }
+    .label-hero #badge-container { padding: 1.25rem 0 .75rem; }
+    .code-box {
+      font-family: var(--mono); font-size: .89rem; font-weight: 700; word-break: break-word;
+      background: var(--g100); border-radius: 4px; padding: .5rem .8rem; display: inline-block;
+    }
+    .code-caption { font-size: .78rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--g400); margin-top: .9rem; }
+    .section-title { font-size: 1.05rem; font-weight: 800; margin: 2rem 0 .6rem; }
+    .dim-card {
+      background: var(--white); border: 1px solid var(--g200); border-radius: 8px;
+      padding: 1rem 1.25rem; margin-bottom: .6rem; display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .dim-icon {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; background: var(--black);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dim-icon svg { width: 28px; height: 28px; }
+    .dim-code { font-family: var(--mono); font-size: .83rem; font-weight: 700; color: var(--g700); }
+    .dim-title { font-weight: 700; }
+    .dim-desc { font-size: .89rem; color: var(--g700); max-width: 65ch; }
+    .info-card { background: var(--white); border: 1px solid var(--g200); border-radius: 8px; padding: 1rem 1.25rem; }
+    .info-card p { max-width: 70ch; }
+    .info-card ul { padding-left: 1.2rem; }
+    .cta { margin-top: 2rem; }
+    .cta a { display: inline-block; background: var(--black); color: var(--white); text-decoration: none; font-weight: 700; padding: .6rem 1.2rem; border-radius: 4px; }
+    .cta a:hover { background: var(--g700); }
+    .error { background: var(--white); border: 1px solid var(--g200); border-radius: 8px; padding: 2rem 1.5rem; }
+    .error h1 { font-size: 1.3rem; margin-bottom: .4rem; }
+    @media (max-width: 620px) { .dim-card { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo-area" href="../">
+    <span class="uk-mark">AI-DTL</span>
+    <span class="header-sub" id="header-version">v 0.5 (Vorschau)</span>
+  </a>
+  <div class="lang-switch" role="group" aria-label="Sprache / Language">
+    <button type="button" id="btn-de" lang="de" aria-pressed="true">DE</button>
+    <button type="button" id="btn-en" lang="en" aria-pressed="false">EN</button>
+  </div>
+</header>
+
+<main class="page" id="content"></main>
+
+<div class="page">
+  <footer>
+    <span>AI-DTL Working Draft 0.5 (Vorschau) · <a href="https://joshuadohmen-sketch.github.io/AIDL/changelog/">Changelog</a></span>
+    <span>
+      <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> ·
+      <a href="https://github.com/joshuadohmen-sketch/AIDL/issues">Feedback</a> ·
+      <a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a>
+    </span>
+  </footer>
+</div>
+
+<script src="../js/spec.js"></script>
+<script src="../js/label-core.js"></script>
+<script src="../js/icons.js"></script>
+<script>
+// Explanation page (Phase 5). Version from "v"; without "v" a link is 0.4.
+// Everything from the URL is set as text; codes come only from the positive list in spec.js.
+(function () {
+'use strict';
+let lang = 'de';
+
+function el(tag, props, ...children) {
+  const node = document.createElement(tag);
+  Object.assign(node, props || {});
+  children.forEach(c => { if (c != null) node.append(c); });
+  return node;
+}
+const fillT = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+
+function dimCard(code, title, desc) {
+  const icon = el('div', { className: 'dim-icon' });
+  icon.setAttribute('aria-hidden', 'true');
+  // ICONS is a fixed table and code is from the positive list
+  icon.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28">${ICONS[code].replace(/currentColor/g, '#ffffff')}</svg>`;
+  return el('div', { className: 'dim-card' }, icon,
+    el('div', {}, el('div', { className: 'dim-code' }, code), el('div', { className: 'dim-title' }, title), el('div', { className: 'dim-desc' }, desc)));
+}
+
+// Sentence with ORCID / ROR links inside the "Accountable" part
+function sentenceNodes(t, sentence, rp) {
+  if (!rp) return [sentence];
+  const at = sentence.indexOf(fillT(t.sentence.resp, { rp }));
+  if (at < 0) return [sentence];
+  const rpAt = at + t.sentence.resp.indexOf('{rp}');
+  const parts = LabelCore.idSegments(rp).map(seg => (seg.type === 'text'
+    ? seg.text : el('a', { href: seg.url, target: '_blank', rel: 'noopener' }, seg.text)));
+  return [sentence.slice(0, rpAt), ...parts, sentence.slice(rpAt + rp.length)];
+}
+
+function render() {
+  const t05 = SPEC['0.5'].i18n[lang];
+  const root = document.getElementById('content');
+  document.documentElement.lang = lang;
+  document.getElementById('header-version').textContent = t05.ui.header_version;
+  document.getElementById('btn-de').setAttribute('aria-pressed', String(lang === 'de'));
+  document.getElementById('btn-en').setAttribute('aria-pressed', String(lang === 'en'));
+
+  const r = LabelCore.fromParams(new URLSearchParams(window.location.search));
+  const cta = el('div', { className: 'cta' }, el('a', { href: '../' }, t05.page.create_own));
+
+  if (!r) {
+    // never echo the input
+    root.replaceChildren(el('div', { className: 'error' }, el('h1', {}, t05.page.invalid), el('p', {}, t05.page.invalid_sub)), cta);
+    document.title = 'AI-DTL – ' + t05.page.invalid;
+    return;
+  }
+
+  const s = r.state;
+  const isN = s.stamm === 'N';
+  const dims = isN ? [s.stamm, s.acc] : [s.stamm, s.host, s.review, s.acc];
+  const nodes = [];
+
+  if (r.v === '0.4') {
+    // Old label: frozen 0.4 definitions, code assembled for display (dates may be missing)
+    const t04 = SPEC['0.4'].i18n[lang];
+    const toolPart = s.tools.length ? ` (${s.tools.map(x => x.name + (x.date ? `, ${x.date}` : '')).join('; ')})` : '';
+    const code = isN ? `AI-DTL 0.4: N/${s.acc}` : `AI-DTL 0.4: ${s.stamm}/${s.host};${s.review};${s.acc}${toolPart}`;
+    document.title = 'AI-DTL – ' + code;
+    const badge = el('div', { id: 'badge-container' });
+    badge.innerHTML = buildBadgeSVG(s, { version: '0.4', title: code });
+    nodes.push(el('section', { className: 'label-hero' },
+      el('p', { className: 'notice' }, t05.page.legacy04),
+      el('p', { className: 'page-sub' }, t04.page.page_sub),
+      badge,
+      el('p', { className: 'code-box' }, code)));
+    if (r.legacyNAccN) nodes.push(el('p', { className: 'notice' }, t04.page.legacy_n_accn));
+    dims.forEach(c => nodes.push(dimCard(c, t04.dims[c].title, t04.dims[c].desc)));
+    if (s.tools.length) {
+      nodes.push(el('h2', { className: 'section-title' }, t05.page.tools));
+      nodes.push(el('div', { className: 'info-card' }, el('ul', {}, ...s.tools.map(x => el('li', {}, x.name + (x.date ? ` (${x.date})` : ''))))));
+    }
+  } else {
+    const code = LabelCore.buildCode(s, r.v);
+    const sentence = LabelCore.buildSentence(s, lang, 'text', r.v);
+    document.title = 'AI-DTL – ' + code;
+    const badge = el('div', { id: 'badge-container' });
+    badge.innerHTML = buildBadgeSVG(s, { version: r.v, words: t05.badge, title: code, desc: sentence, url: window.location.href });
+    nodes.push(el('section', { className: 'label-hero' },
+      el('p', { className: 'sentence' }, ...sentenceNodes(t05, sentence, s.rp)),
+      badge,
+      el('p', { className: 'code-caption' }, t05.page.code),
+      el('p', { className: 'code-box' }, code)));
+    dims.forEach(c => nodes.push(dimCard(c, t05.opt[c].lbl, t05.opt[c].dsc)));
+    if (s.tools.length) {
+      nodes.push(el('h2', { className: 'section-title' }, t05.page.tools));
+      nodes.push(el('div', { className: 'info-card' }, el('ul', {}, ...s.tools.map(x => el('li', {}, `${x.name} (${x.date})`)))));
+    }
+  }
+
+  nodes.push(el('h2', { className: 'section-title' }, t05.page.not_says_title));
+  nodes.push(el('div', { className: 'info-card' }, el('p', {}, t05.page.not_says)));
+  nodes.push(el('h2', { className: 'section-title' }, t05.page.eu_title));
+  nodes.push(el('div', { className: 'info-card' }, el('p', {}, t05.page.eu)));
+  nodes.push(cta);
+  root.replaceChildren(...nodes);
+}
+
+document.getElementById('btn-de').addEventListener('click', () => { lang = 'de'; render(); });
+document.getElementById('btn-en').addEventListener('click', () => { lang = 'en'; render(); });
+render();
+})();
+</script>
+</body>
+</html>
