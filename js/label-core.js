@@ -6,6 +6,9 @@
 //   normalized  – one value per dimension: { v, stamm, host, review, acc,
 //                 tools: [{ name, date: 'MM/YYYY' | '' }], p, rp }
 
+const LabelCore = (function () {
+'use strict';
+
 const LC = (typeof module !== 'undefined') ? require('./spec.js') : { SPEC, SITE_BASE };
 
 function getSpec(v) {
@@ -384,8 +387,9 @@ function escLatexText(s, opts = {}) {
 }
 
 function escLatexUrl(s) {
-  // A raw backslash never belongs in a URL; percent-encode it instead of escaping.
-  return String(s).replace(/\\/g, '%5C').replace(/[%#&~]/g, c => '\\' + c);
+  // A raw backslash never belongs in a URL, and _ breaks inside \footnote{}: percent-encode
+  // both (same URL after decoding), then escape what hyperref expects escaped.
+  return String(s).replace(/\\/g, '%5C').replace(/_/g, '%5F').replace(/[%#&~]/g, c => '\\' + c);
 }
 
 // Backtick fence one longer than the longest backtick run in the text (CommonMark code span).
@@ -468,12 +472,13 @@ function buildExport(fmt, input, opts = {}) {
   }
 }
 
-const LabelCore = {
+return {
   getSpec, isCode, fill, effectiveStamm, effectiveHost, cleanFreeText, isValidToolName, stripToolChars,
   TOOL_FORBIDDEN, DATE_RE, normalize, validate, buildCode, parseCode, toParams, buildURL, fromParams,
   idSegments, stripIds, buildSentence, warnings, warningRules, euIconSuggestion, art50Hint,
   helperResult, helperNext, suggestedHosts, escHtml, escAttr, escMd, escLatexText, escLatexUrl,
   mdCodeSpan, buildExport,
 };
+})();
 
 if (typeof module !== 'undefined') module.exports = LabelCore;
