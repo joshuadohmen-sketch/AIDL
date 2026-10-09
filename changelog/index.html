@@ -51,6 +51,9 @@
       border-radius: 50%; background: var(--red); flex-shrink: 0;
     }
     .change-section ul { padding-left: 1.3rem; }
+    .change-section > p { font-size: .9rem; color: var(--g700); line-height: 1.55; }
+    .change-section .draft-note { margin-bottom: .6rem; }
+    .change-section a { color: var(--black); }
     .change-section li { margin-bottom: .4rem; font-size: .9rem; color: var(--g700); line-height: 1.5; }
     .change-section li strong { color: var(--black); font-family: 'Courier New', monospace; }
     .tag {
@@ -83,6 +86,28 @@
 <main class="page">
   <h1>Changelog</h1>
   <p class="version-meta">AI-DTL Working Draft – Versionsgeschichte</p>
+
+  <div class="change-section">
+    <h2>Ausblick: Validierungsstudie</h2>
+    <p>Bevor AI-DTL eine Version 1.0 erhält, prüfen wir es mit Nutzer:innen: Kennzeichnen verschiedene Menschen denselben Fall gleich? Verstehen Lesende, was das Label sagt? Die Ergebnisse fließen in Version 0.5 und 1.0 ein.</p>
+  </div>
+
+  <div class="change-section">
+    <h2>Version 0.5 <span class="tag change">Entwurf</span></h2>
+    <p class="draft-note">Vorschau unter <a href="../rc/">/rc/</a> – wird vor der Freigabe in einer Studie geprüft.</p>
+    <ul>
+      <li><span class="tag new">Neu</span> Label = Klartextsatz + Code.</li>
+      <li><span class="tag new">Neu</span> Neue Stufe M „Bestehendes verändert“ (vorbehaltlich Studie).</li>
+      <li><span class="tag change">Änderung</span> Hosting nach der Frage „Auf wessen Rechnern lief die KI?“, Host-Vorschlag aus dem gewählten Dienst.</li>
+      <li><span class="tag change">Änderung</span> Werkzeug und Monat der letzten Nutzung sind Pflicht.</li>
+      <li><span class="tag new">Neu</span> Optionale Angaben „Wofür?“ und „Wer steht dafür ein?“ (nur im Satz).</li>
+      <li><span class="tag new">Neu</span> Hinweis zur Kennzeichnungspflicht nach Art. 50 mit Verweis auf die EU-Kennzeichen.</li>
+      <li><span class="tag new">Neu</span> Entscheidungshilfe, Beispiele, „Neu beginnen“.</li>
+      <li><span class="tag change">Design</span> Barrierearm bedienbar.</li>
+      <li><span class="tag new">Neu</span> Sprechtext für Audio.</li>
+      <li><span class="tag new">Neu</span> Neue Erklärseite.</li>
+    </ul>
+  </div>
 
   <div class="change-section">
     <h2>Version 0.4.1 <span class="tag change">Oktober 2026</span></h2>
