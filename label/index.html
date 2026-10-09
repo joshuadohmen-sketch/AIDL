@@ -13,7 +13,7 @@
       --white: #ffffff;
       --g100: #f5f5f5;
       --g200: #e8e8e8;
-      --g400: #999999;
+      --g400: #6e6e6e;
       --g700: #333333;
       --font: 'Open Sans', Arial, sans-serif;
     }
@@ -59,14 +59,17 @@
       padding: 1.2rem 1.5rem; margin-bottom: .75rem;
       display: flex; align-items: center; gap: 1.2rem;
     }
-    .dim-card.warn { border-left: 3px solid var(--red); }
     .dim-icon {
       width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       background: var(--black); color: var(--white);
     }
-    .dim-icon.warn { background: var(--red); }
     .dim-icon svg { width: 28px; height: 28px; }
+    .page-sub { font-size: .85rem; color: var(--g400); margin-bottom: .5rem; }
+    .legacy-note {
+      background: var(--white); border: 1px solid var(--g200); border-radius: 6px;
+      padding: .8rem 1.2rem; margin-bottom: .75rem; font-size: .85rem; color: var(--g700);
+    }
     .dim-body { flex: 1; }
     .dim-code { font-family: 'Courier New', monospace; font-size: .75rem; font-weight: 700; color: var(--g400); letter-spacing: .5px; }
     .dim-title { font-size: .95rem; font-weight: 700; margin: 2px 0; }
@@ -109,7 +112,7 @@
 <header class="site-header">
   <a class="logo-area" href="../">
     <span class="uk-mark">AI-DTL</span>
-    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.4</em></span>
+    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.4.1</em></span>
   </a>
   <div class="lang-switch">
     <button id="btn-de" class="active" onclick="setLang('de')">DE</button>
@@ -120,7 +123,7 @@
 <main class="page">
   <div id="content"></div>
   <footer>
-    <span>AI-DTL Working Draft 0.4 · Juni 2026 · <a href="../changelog/">Changelog</a></span>
+    <span>AI-DTL Working Draft 0.4.1 · Oktober 2026 · <a href="../changelog/">Changelog</a></span>
     <span>
       <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">CC BY 4.0</a> ·
       DOI folgt (Zenodo) ·
@@ -142,6 +145,7 @@ const T = {
     invalid: 'Ungültiges Label',
     invalid_sub: 'Die URL enthält kein gültiges AI-DTL-Label. Bitte verwenden Sie den Generator.',
     tool_used: 'Verwendetes KI-System',
+    legacy_n_accn: 'Diese Kombination ist seit Version 0.4 nicht mehr vorgesehen.',
     dims: {
       N:      { title: 'Keine KI-Beteiligung',         desc: 'Dieses Artefakt wurde vollständig ohne KI-Unterstützung erstellt.' },
       A:      { title: 'Assistive KI-Nutzung',         desc: 'KI wurde ausschließlich für Hilfsfunktionen wie Sprachpolitur, Rechtschreibkorrektur oder Übersetzung eingesetzt.' },
@@ -167,6 +171,7 @@ const T = {
     invalid: 'Invalid label',
     invalid_sub: 'This URL does not contain a valid AI-DTL label. Please use the generator.',
     tool_used: 'AI system used',
+    legacy_n_accn: 'This combination is no longer intended since version 0.4.',
     dims: {
       N:      { title: 'No AI involvement',            desc: 'This artefact was created entirely without AI assistance.' },
       A:      { title: 'Assistive AI use',             desc: 'AI was used only for auxiliary functions such as language polishing, spell-checking, or translation.' },
@@ -187,7 +192,15 @@ const T = {
   },
 };
 
-const WARN_CODES = new Set(['H:C!', 'R:N', 'Acc:N']);
+// Positive list for 0.4. Anything else is rejected without echoing the input.
+const CODES = {
+  stamm:  ['N', 'A', 'S', 'G'],
+  host:   ['H:L', 'H:I', 'H:C', 'H:C!'],
+  review: ['R:H', 'R:M', 'R:HM', 'R:N'],
+  acc:    ['Acc:I', 'Acc:O', 'Acc:N'],
+};
+const TOOL_DISPLAY_MAX = 200;
+const DATE_RE = /^(0[1-9]|1[0-2])\/\d{4}$/;
 
 function setLang(l) {
   lang = l;
@@ -197,97 +210,99 @@ function setLang(l) {
   renderPage();
 }
 
+// Returns a validated label state, or null if any code is not on the positive list.
+// Tool names are never rejected; they are only shortened for display and set as text.
 function parseParams() {
   const p = new URLSearchParams(window.location.search);
+  const stamm = p.get('s'), acc = p.get('a');
+  if (!CODES.stamm.includes(stamm) || !CODES.acc.includes(acc)) return null;
+  if (stamm === 'N') {
+    return { stamm, acc, host: null, review: null, tools: [], legacyNAccN: acc === 'Acc:N' };
+  }
+  const host = p.get('h'), review = p.get('r');
+  if (!CODES.host.includes(host) || !CODES.review.includes(review)) return null;
+
   const tRaw = p.get('t') || '';
   const dRaw = p.get('d') || '';
-  return {
-    stamm:  p.get('s'),
-    host:   p.get('h'),
-    review: p.get('r'),
-    acc:    p.get('a'),
-    tools:  tRaw ? tRaw.split('|') : [],
-    dates:  dRaw ? dRaw.split('|') : [],
-  };
+  const names = tRaw ? tRaw.split('|') : [];
+  const dates = dRaw ? dRaw.split('|') : [];
+  const tools = names
+    .map((n, i) => {
+      let name = n.trim();
+      if (name.length > TOOL_DISPLAY_MAX) name = name.slice(0, TOOL_DISPLAY_MAX) + '…';
+      const d = (dates[i] || '').trim();
+      return { name, date: DATE_RE.test(d) ? d : '' };
+    })
+    .filter(tool => tool.name);
+  return { stamm, acc, host, review, tools, legacyNAccN: false };
 }
 
 function buildLabelString(p) {
-  if (!p.stamm || !p.acc) return null;
   if (p.stamm === 'N') return `AI-DTL 0.4: N/${p.acc}`;
-  if (!p.host || !p.review) return null;
-  const toolParts = p.tools
-    .filter(n => n.trim())
-    .map((n, i) => n.trim() + (p.dates[i] ? `, ${p.dates[i]}` : ''));
+  const toolParts = p.tools.map(tool => tool.name + (tool.date ? `, ${tool.date}` : ''));
   const tool = toolParts.length ? ` (${toolParts.join('; ')})` : '';
   return `AI-DTL 0.4: ${p.stamm}/${p.host};${p.review};${p.acc}${tool}`;
 }
 
+// Small DOM helper: el('div', { className: 'x' }, child, 'text', …)
+function el(tag, props, ...children) {
+  const node = document.createElement(tag);
+  Object.assign(node, props || {});
+  children.forEach(c => { if (c != null) node.append(c); });
+  return node;
+}
+
 function renderDimCard(code) {
   const t = T[lang].dims[code];
-  if (!t) return '';
-  const isWarn = WARN_CODES.has(code);
-  const iconPaths = (ICONS[code] || '').replace(/currentColor/g, '#ffffff');
-  return `
-    <div class="dim-card${isWarn ? ' warn' : ''}">
-      <div class="dim-icon${isWarn ? ' warn' : ''}">
-        <svg viewBox="0 0 24 24" width="28" height="28">${iconPaths}</svg>
-      </div>
-      <div class="dim-body">
-        <div class="dim-code">${code}</div>
-        <div class="dim-title">${t.title}</div>
-        <div class="dim-desc">${t.desc}</div>
-      </div>
-    </div>`;
+  const icon = el('div', { className: 'dim-icon' });
+  // ICONS is a fixed in-page table and code is from the positive list
+  icon.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">${ICONS[code].replace(/currentColor/g, '#ffffff')}</svg>`;
+  return el('div', { className: 'dim-card' },
+    icon,
+    el('div', { className: 'dim-body' },
+      el('div', { className: 'dim-code' }, code),
+      el('div', { className: 'dim-title' }, t.title),
+      el('div', { className: 'dim-desc' }, t.desc)));
 }
 
 function renderPage() {
   const p = parseParams();
-  const label = buildLabelString(p);
   const t = T[lang];
-  const el = document.getElementById('content');
+  const root = document.getElementById('content');
+  const cta = (withSub) => el('div', { className: 'cta' },
+    el('a', { href: '../' }, t.create_own),
+    withSub ? el('p', {}, t.create_sub) : null);
 
-  if (!label) {
-    el.innerHTML = `
-      <div class="error">
-        <h2>${t.invalid}</h2>
-        <p>${t.invalid_sub}</p>
-      </div>
-      <div class="cta"><a href="../">${t.create_own}</a></div>`;
+  if (!p) {
+    root.replaceChildren(
+      el('div', { className: 'error' }, el('h2', {}, t.invalid), el('p', {}, t.invalid_sub)),
+      cta(false));
     document.title = 'AI-DTL – ' + t.invalid;
     return;
   }
 
+  const label = buildLabelString(p);
   document.title = 'AI-DTL – ' + label;
 
-  const state = { stamm: p.stamm, host: p.host, review: p.review, acc: p.acc };
-  const badge = buildBadgeSVG(state, label);
+  const badge = el('div');
+  badge.innerHTML = buildBadgeSVG({ stamm: p.stamm, host: p.host, review: p.review, acc: p.acc }, '0.4');
 
-  const dims = [p.stamm];
-  if (p.stamm !== 'N') {
-    if (p.host) dims.push(p.host);
-    if (p.review) dims.push(p.review);
+  const dims = p.stamm === 'N' ? [p.stamm, p.acc] : [p.stamm, p.host, p.review, p.acc];
+
+  const nodes = [
+    el('div', { className: 'badge-hero' },
+      el('p', { className: 'page-sub' }, t.page_sub),
+      badge,
+      el('div', { className: 'label-string' }, label)),
+  ];
+  if (p.legacyNAccN) nodes.push(el('div', { className: 'legacy-note' }, t.legacy_n_accn));
+  dims.forEach(code => nodes.push(renderDimCard(code)));
+  if (p.tools.length) {
+    const list = p.tools.map(tool => tool.name + (tool.date ? ` (${tool.date})` : '')).join('; ');
+    nodes.push(el('div', { className: 'tool-info' }, el('strong', {}, t.tool_used + ':'), ' ' + list));
   }
-  if (p.acc) dims.push(p.acc);
-
-  let toolHtml = '';
-  const validTools = p.tools.filter(n => n.trim());
-  if (validTools.length) {
-    const toolList = validTools.map((n, i) => `${n.trim()}${p.dates[i] ? ' (' + p.dates[i] + ')' : ''}`).join('; ');
-    toolHtml = `<div class="tool-info"><strong>${t.tool_used}:</strong> ${toolList}</div>`;
-  }
-
-  el.innerHTML = `
-    <div class="badge-hero">
-      <p style="font-size:.85rem;color:var(--g400);margin-bottom:.5rem;">${t.page_sub}</p>
-      ${badge}
-      <div class="label-string">${label}</div>
-    </div>
-    ${dims.map(renderDimCard).join('')}
-    ${toolHtml}
-    <div class="cta">
-      <a href="../">${t.create_own}</a>
-      <p>${t.create_sub}</p>
-    </div>`;
+  nodes.push(cta(true));
+  root.replaceChildren(...nodes);
 }
 
 renderPage();

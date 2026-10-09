@@ -37,16 +37,23 @@ function iconSVG(key, size = 24) {
 }
 
 // ── Badge rendering
-// Generates an inline SVG badge (CC-style) for the current selection
-function buildBadgeSVG(state, labelText) {
+// Generates an inline SVG badge (CC-style) for the current selection.
+// Neutral by design: word mark, black circles, no warning colours.
+// Only codes that have a pictogram are rendered, so nothing from a URL reaches the SVG unchecked.
+function svgEsc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function buildBadgeSVG(state, version = '0.4') {
+  const known = c => typeof c === 'string' && Object.prototype.hasOwnProperty.call(ICONS, c);
   const dims = [];
 
-  if (state.stamm) dims.push({ key: state.stamm, code: state.stamm });
+  if (known(state.stamm)) dims.push(state.stamm);
   if (state.stamm !== 'N') {
-    if (state.host) dims.push({ key: state.host, code: state.host });
-    if (state.review) dims.push({ key: state.review, code: state.review });
+    if (known(state.host)) dims.push(state.host);
+    if (known(state.review)) dims.push(state.review);
   }
-  if (state.acc) dims.push({ key: state.acc, code: state.acc });
+  if (known(state.acc)) dims.push(state.acc);
 
   if (dims.length === 0) return '';
 
@@ -54,41 +61,35 @@ function buildBadgeSVG(state, labelText) {
   const gap = 56;
   const padX = 20;
   const padY = 14;
-  // EU prefix: same circle size, then a thin divider, then dimension circles
-  const euGap = 66;
-  const euCX = padX + r;
   const cy = padY + r;
-  const dimStartX = euCX + euGap;
+  // Word mark "AI-DTL" + version, thin divider, then one circle per dimension
+  const wmW = 64;
+  const divX = padX + wmW + 10;
+  const dimStartX = divX + 12 + r;
   const totalW = dimStartX + (dims.length - 1) * gap + r + padX;
   const h = r * 2 + padY + 26;
-  const divX = euCX + r + 12;
 
-  let circles = `
-    <circle cx="${euCX}" cy="${cy}" r="${r}" fill="#000000"/>
-    <text x="${euCX}" y="${cy + 6}" text-anchor="middle"
-          font-family="Arial Black, Arial, sans-serif" font-size="15" font-weight="900"
-          fill="#ffffff">AI</text>
-    <text x="${euCX}" y="${cy + r + 14}" text-anchor="middle"
-          font-family="'Courier New',monospace" font-size="10" font-weight="700"
-          fill="#999">EU</text>
+  let body = `
+    <text x="${padX}" y="${cy + 2}" font-family="'Open Sans', Arial, sans-serif"
+          font-size="15" font-weight="800" fill="#000000" letter-spacing=".5">AI-DTL</text>
+    <text x="${padX}" y="${cy + 16}" font-family="'Open Sans', Arial, sans-serif"
+          font-size="10" font-weight="600" fill="#555555">${svgEsc(version)}</text>
     <line x1="${divX}" y1="${padY + 4}" x2="${divX}" y2="${padY + r * 2 - 4}"
           stroke="#cccccc" stroke-width="1"/>`;
 
-  dims.forEach((d, i) => {
+  dims.forEach((code, i) => {
     const cx = dimStartX + i * gap;
-    const isWarn = d.code === 'H:C!' || d.code === 'R:N' || d.code === 'Acc:N';
-    const fill = isWarn ? '#c61a27' : '#000000';
-    const iconPaths = (ICONS[d.key] || '').replace(/currentColor/g, '#ffffff');
-    circles += `
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>
+    const iconPaths = ICONS[code].replace(/currentColor/g, '#ffffff');
+    body += `
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="#000000"/>
       <g transform="translate(${cx - 12},${cy - 12})">${iconPaths}</g>
       <text x="${cx}" y="${cy + r + 14}" text-anchor="middle"
             font-family="'Courier New',monospace" font-size="10" font-weight="700"
-            fill="#666">${d.code}</text>`;
+            fill="#555555">${svgEsc(code)}</text>`;
   });
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${h}" width="${totalW}" class="dtl-badge">
-    ${circles}
+    ${body}
   </svg>`;
 }
 

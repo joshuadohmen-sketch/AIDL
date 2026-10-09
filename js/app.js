@@ -51,13 +51,16 @@ const T = {
     an_lbl: 'None claimed',    an_dsc: 'Rein agentischer Raum – kein Mensch steht ein',
     tool_ph: 'z.B. Claude Opus 4.6', tool_aria: 'KI-Tool Name',
     btn_add_tool: '+ weiteres Tool', remove_tool_aria: 'Tool entfernen',
-    warn_txt: '⚠ Die gewählte Kombination enthält kritische Merkmale. In vielen institutionellen Kontexten ist diese Konfiguration problematisch oder unzulässig.',
+    warn: {
+      hcx:    'Cloud-Nutzung ohne Auftragsverarbeitungsvertrag (AVV): Wenn Sie personenbezogene oder vertrauliche Daten eingegeben haben, ist das in der Regel nicht zulässig.',
+      g_rn:   'Generative KI-Ausgaben wurden ungeprüft übernommen. Prüfen Sie Fakten und Quellen vor der Veröffentlichung.',
+      g_accn: 'Für generative KI-Inhalte ist keine Verantwortung angegeben. Passt „Organizational“?',
+    },
     warn_when_title: 'Wann warnt der Generator?',
-    warn_when_body: '<ul><li><strong>H:C!</strong> – Cloud-Nutzung ohne Auftragsverarbeitungsvertrag (AVV). In vielen institutionellen Kontexten datenschutzrechtlich unzulässig.</li><li><strong>G + R:N</strong> – Generative KI-Ausgabe wurde ungeprüft übernommen. Erhöhtes Fehler- und Halluzinationsrisiko.</li><li><strong>G + Acc:N</strong> – Keine Verantwortlichkeit bei generativer KI-Nutzung deklariert.</li><li><strong>G + R:N + Acc:N</strong> – Maximale Warnstufe: vollautomatisch generiert, ungeprüft, keine Verantwortung.</li></ul>',
     result_label: 'Ihr AI-DTL-Label',
     result_ph: 'Bitte alle Felder ausfüllen …',
     btn_text: 'Text kopieren', btn_meta: 'HTML &lt;meta&gt;', btn_md: 'Markdown',
-    btn_latex: 'LaTeX', btn_link: 'Link kopieren', btn_jsonld: 'JSON-LD',
+    btn_latex: 'LaTeX', btn_link: 'Link kopieren',
     btn_badge: 'Badge ↓ SVG', btn_png: 'Badge ↓ PNG',
     no_ai_hint: 'Bei N entfallen Host, Review und Tool. Bitte Accountability auswählen.',
     month_ph: 'Monat', year_ph: 'Jahr',
@@ -97,13 +100,16 @@ const T = {
     an_lbl: 'None claimed',    an_dsc: 'Purely agentic context – no human stands behind this',
     tool_ph: 'e.g. Claude Opus 4.6', tool_aria: 'AI tool name',
     btn_add_tool: '+ add tool', remove_tool_aria: 'Remove tool',
-    warn_txt: '⚠ This combination contains critical markers. In many institutional contexts this configuration may be problematic or unlawful.',
+    warn: {
+      hcx:    'Cloud use without a data processing agreement (DPA): if you entered personal or confidential data, this is usually not permitted.',
+      g_rn:   'Generative AI output was adopted without review. Check facts and sources before publishing.',
+      g_accn: 'No accountability is declared for generative AI content. Would “Organizational” fit?',
+    },
     warn_when_title: 'When does the generator warn?',
-    warn_when_body: '<ul><li><strong>H:C!</strong> – Cloud use without data processing agreement (DPA). Unlawful in many institutional contexts under data protection law.</li><li><strong>G + R:N</strong> – Generative AI output adopted without any review. Elevated risk of errors and hallucinations.</li><li><strong>G + Acc:N</strong> – No accountability declared for generative AI content.</li><li><strong>G + R:N + Acc:N</strong> – Maximum warning level: fully AI-generated, unreviewed, no accountability declared.</li></ul>',
     result_label: 'Your AI-DTL Label',
     result_ph: 'Please complete all fields …',
     btn_text: 'Copy text', btn_meta: 'HTML &lt;meta&gt;', btn_md: 'Markdown',
-    btn_latex: 'LaTeX', btn_link: 'Copy link', btn_jsonld: 'JSON-LD',
+    btn_latex: 'LaTeX', btn_link: 'Copy link',
     btn_badge: 'Badge ↓ SVG', btn_png: 'Badge ↓ PNG',
     no_ai_hint: 'For N, Host, Review and Tool are omitted. Please select Accountability.',
     month_ph: 'Month', year_ph: 'Year',
@@ -116,6 +122,45 @@ const T = {
     },
   },
 };
+
+// ── Hints for the person creating the label (never shown in the badge).
+// The "When does the generator warn?" list is generated from the same rules.
+const WARN_RULES = [
+  { id: 'hcx',    trigger: 'H:C!',      when: s => s.host === 'H:C!' },
+  { id: 'g_rn',   trigger: 'G + R:N',   when: s => s.stamm === 'G' && s.review === 'R:N' },
+  { id: 'g_accn', trigger: 'G + Acc:N', when: s => s.stamm === 'G' && s.acc === 'Acc:N' },
+];
+
+// ── Canonical link base: shared links always point to the public site,
+// except when the editor runs locally for development.
+const CANONICAL_BASE = 'https://joshuadohmen-sketch.github.io/AIDL/';
+function siteBase() {
+  const { protocol, hostname, href } = window.location;
+  if (protocol === 'file:' || hostname === 'localhost' || hostname === '127.0.0.1') {
+    return href.replace(/[?#].*$/, '').replace(/index\.html$/, '');
+  }
+  return CANONICAL_BASE;
+}
+
+// ── Escaping for exports
+function escAttr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escMd(s) {
+  return String(s).replace(/[\\[\]()*_`]/g, '\\$&');
+}
+const LATEX_TEXT = {
+  '\\': '\\textbackslash{}', '{': '\\{', '}': '\\}', '$': '\\$', '&': '\\&', '#': '\\#',
+  '^': '\\textasciicircum{}', '_': '\\_', '%': '\\%', '~': '\\textasciitilde{}',
+};
+function escLatexText(s) {
+  return String(s).replace(/[\\{}$&#^_%~]/g, c => LATEX_TEXT[c]);
+}
+function escLatexUrl(s) {
+  // A raw backslash never belongs in a URL; percent-encode it instead of escaping.
+  return String(s).replace(/\\/g, '%5C').replace(/[%#&~]/g, c => '\\' + c);
+}
 
 // ── Language switch
 function setLang(l) {
@@ -139,6 +184,18 @@ function applyT() {
     const k = el.dataset.i18nPh;
     if (t[k]) el.placeholder = t[k];
   });
+  const whenBody = document.querySelector('.warn-details-body');
+  if (whenBody) {
+    const ul = document.createElement('ul');
+    WARN_RULES.forEach(rule => {
+      const li = document.createElement('li');
+      const strong = document.createElement('strong');
+      strong.textContent = rule.trigger;
+      li.append(strong, ' – ' + t.warn[rule.id]);
+      ul.appendChild(li);
+    });
+    whenBody.replaceChildren(ul);
+  }
 }
 
 // ── Inject icons into option cards
@@ -241,7 +298,6 @@ function buildLabelURL() {
   const stamm = effectiveStamm();
   const { review, acc } = S;
   if (!stamm || !acc) return null;
-  const base = window.location.origin + window.location.pathname.replace(/\/$/, '').replace(/\/index\.html$/, '');
   const params = new URLSearchParams();
   params.set('s', stamm);
   if (stamm !== 'N') {
@@ -258,7 +314,7 @@ function buildLabelURL() {
     params.set('t', valid.map(t => t.name.trim()).join('|'));
     params.set('d', valid.map(t => t.month && t.year ? `${t.month}/${t.year}` : '').join('|'));
   }
-  return `${base}/label/?${params.toString()}`;
+  return `${siteBase()}label/?${params.toString()}`;
 }
 
 // ── Render output
@@ -271,12 +327,20 @@ function render() {
   const exp      = document.getElementById('explain-out');
 
   if (label) {
-    badgeC.innerHTML = buildBadgeSVG({ stamm, host, review: S.review, acc: S.acc }, label);
+    badgeC.innerHTML = buildBadgeSVG({ stamm, host, review: S.review, acc: S.acc }, '0.4');
     const url = buildLabelURL();
     labelOut.style.display = 'flex';
-    labelOut.innerHTML = url
-      ? `<a href="${url}" style="color:inherit;text-decoration:none;border-bottom:1px dashed var(--g400);" target="_blank">${label}</a>`
-      : label;
+    if (url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'label-link';
+      a.textContent = label;
+      labelOut.replaceChildren(a);
+    } else {
+      labelOut.textContent = label;
+    }
     const e = T[lang].exp;
     const parts = [e[stamm]];
     if (stamm !== 'N') {
@@ -286,14 +350,34 @@ function render() {
     if (S.acc) parts.push(e[S.acc]);
     exp.textContent = parts.join(' · ');
   } else {
-    badgeC.innerHTML = `<span class="ph">${T[lang].result_ph}</span>`;
+    const ph = document.createElement('span');
+    ph.className = 'ph';
+    ph.textContent = T[lang].result_ph;
+    badgeC.replaceChildren(ph);
     labelOut.style.display = 'none';
     labelOut.textContent = '';
     exp.textContent = '';
   }
 
-  const warn = host === 'H:C!' || S.review === 'R:N' || S.acc === 'Acc:N';
-  document.getElementById('warn-banner').classList.toggle('show', !!warn && !!label);
+  // Hints name their trigger; only for the person creating the label
+  const banner = document.getElementById('warn-banner');
+  const active = label
+    ? WARN_RULES.filter(r => r.when({ stamm, host, review: S.review, acc: S.acc }))
+    : [];
+  if (active.length) {
+    const ul = document.createElement('ul');
+    active.forEach(rule => {
+      const li = document.createElement('li');
+      const strong = document.createElement('strong');
+      strong.textContent = rule.trigger + ': ';
+      li.append(strong, T[lang].warn[rule.id]);
+      ul.appendChild(li);
+    });
+    banner.replaceChildren(ul);
+  } else {
+    banner.replaceChildren();
+  }
+  banner.classList.toggle('show', active.length > 0);
 }
 
 // ── Copy to clipboard
@@ -304,23 +388,15 @@ function copyAs(type) {
     return;
   }
   const url = buildLabelURL();
-  const jsonld = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'CreativeWork',
-    additionalProperty: {
-      '@type': 'PropertyValue',
-      name: 'AI-DTL',
-      value: label,
-    }
-  }, null, 2);
+  // "--" may not appear inside an HTML comment; %2D decodes to the same URL.
+  const commentUrl = url.replace(/--/g, '-%2D');
 
   const map = {
-    plain:  url ? `${label}\n${url}` : label,
-    meta:   `<meta name="ai-dtl" content="${label}">\n<!-- ${url || ''} -->`,
-    md:     url ? `> [${label}](${url})` : `> ${label}`,
-    latex:  url ? `\\href{${url}}{\\texttt{${label}}}` : `\\texttt{${label}}`,
-    link:   url || label,
-    jsonld,
+    plain:  `${label}\n${url}`,
+    meta:   `<meta name="ai-dtl" content="${escAttr(label)}">\n<!-- ${commentUrl} -->`,
+    md:     `> [${escMd(label)}](${url})`,
+    latex:  `% benötigt \\usepackage{hyperref}\n\\href{${escLatexUrl(url)}}{\\texttt{${escLatexText(label)}}}`,
+    link:   url,
   };
   const text = map[type];
   const flash = () => {
@@ -352,7 +428,7 @@ function fallbackCopy(text, cb) {
 function ddItems(kind) {
   if (kind === 'month') return T[lang].months.map((m, i) => ({ v: String(i + 1).padStart(2, '0'), l: m }));
   const y = new Date().getFullYear();
-  return Array.from({ length: 8 }, (_, i) => String(y + 1 - i)).map(v => ({ v, l: v }));
+  return Array.from({ length: 8 }, (_, i) => String(y - i)).map(v => ({ v, l: v }));
 }
 
 function closeAllDD() {

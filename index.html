@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="logo-area">
     <span class="uk-mark">AI-DTL</span>
-    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.4</em></span>
+    <span class="header-sub">AI Disclosure &amp; Transparency Label <em>v 0.4.1</em></span>
   </div>
   <div class="lang-switch">
     <button id="btn-de" class="active" onclick="setLang('de')">DE</button>
@@ -95,7 +95,7 @@
         <span class="lbl" data-i18n="hc_lbl">Cloud w/ DPA</span>
         <span class="dsc" data-i18n="hc_dsc">Kommerzieller Cloud-Dienst mit AVV</span>
       </div>
-      <div class="opt" data-warn="red" data-dim="host" data-val="H:C!" onclick="pick(this)">
+      <div class="opt" data-dim="host" data-val="H:C!" onclick="pick(this)">
         <div class="opt-icon" data-icon="H:C!"></div>
         <span class="code">H:C!</span>
         <span class="lbl" data-i18n="hcx_lbl">Cloud w/o DPA</span>
@@ -131,7 +131,7 @@
         <span class="lbl" data-i18n="rhm_lbl">Both</span>
         <span class="dsc" data-i18n="rhm_dsc">Mensch und Maschine haben geprüft</span>
       </div>
-      <div class="opt" data-warn="red" data-dim="review" data-val="R:N" onclick="pick(this)">
+      <div class="opt" data-dim="review" data-val="R:N" onclick="pick(this)">
         <div class="opt-icon" data-icon="R:N"></div>
         <span class="code">R:N</span>
         <span class="lbl" data-i18n="rn_lbl">None</span>
@@ -160,7 +160,7 @@
         <span class="lbl" data-i18n="ao_lbl">Organizational</span>
         <span class="dsc" data-i18n="ao_dsc">Organisation übernimmt Verantwortung</span>
       </div>
-      <div class="opt" data-warn="red" data-dim="acc" data-val="Acc:N" onclick="pick(this)">
+      <div class="opt" data-dim="acc" data-val="Acc:N" onclick="pick(this)">
         <div class="opt-icon" data-icon="Acc:N"></div>
         <span class="code">Acc:N</span>
         <span class="lbl" data-i18n="an_lbl">None claimed</span>
@@ -182,9 +182,7 @@
   </div>
 
   <!-- Warning banner -->
-  <div class="warn-banner" id="warn-banner" data-i18n="warn_txt">
-    ⚠ Die gewählte Kombination enthält kritische Merkmale. In vielen institutionellen Kontexten ist diese Konfiguration problematisch oder unzulässig.
-  </div>
+  <div class="warn-banner" id="warn-banner" aria-live="polite"></div>
 
   <!-- Warning details (collapsible) -->
   <details class="warn-details">
@@ -208,7 +206,6 @@
       <button class="copy-btn" data-fmt="meta"   onclick="copyAs('meta')"   data-i18n="btn_meta">HTML &lt;meta&gt;</button>
       <button class="copy-btn" data-fmt="md"     onclick="copyAs('md')"     data-i18n="btn_md">Markdown</button>
       <button class="copy-btn" data-fmt="latex"  onclick="copyAs('latex')"  data-i18n="btn_latex">LaTeX</button>
-      <button class="copy-btn" data-fmt="jsonld" onclick="copyAs('jsonld')" data-i18n="btn_jsonld">JSON-LD</button>
       <button class="copy-btn" data-fmt="link"   onclick="copyAs('link')"   data-i18n="btn_link">Link kopieren</button>
       <button class="copy-btn" onclick="downloadBadge()"    data-i18n="btn_badge">Badge ↓ SVG</button>
       <button class="copy-btn" onclick="downloadBadgePNG()" data-i18n="btn_png">Badge ↓ PNG</button>
@@ -216,7 +213,7 @@
   </div>
 
   <footer>
-    <span>AI-DTL Working Draft 0.4 · Juni 2026 · <a href="changelog/">Changelog</a></span>
+    <span>AI-DTL Working Draft 0.4.1 · Oktober 2026 · <a href="changelog/">Changelog</a></span>
     <span>
       <a href="https://creativecommons.org/licenses/by/4.0" target="_blank">CC BY 4.0</a> ·
       DOI folgt (Zenodo) ·
