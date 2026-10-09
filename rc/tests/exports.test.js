@@ -80,6 +80,22 @@ test('special characters are masked in every format', () => {
   assert.ok(md.includes('[`AI-DTL 0.5: G/H:C;R:H;Acc:I (R&D_Bot "v2" 50% #1, 05/2026)`]('));
 });
 
+test('Markdown: parentheses in the sentence stay unmasked', () => {
+  const s = { ...STATES['D.1'], p: 'Gliederung (Kapitel 2)' };
+  const md = core.buildExport('md', s, { v: '0.5', lang: 'de', base: SITE_BASE });
+  assert.ok(md.startsWith('> Inhalt von Menschen; KI hat die Arbeit unterstützt. KI eingesetzt für: Gliederung (Kapitel 2).'));
+});
+
+test('option titles carry the letter of their code', () => {
+  const { SPEC } = require('../js/spec.js');
+  const de = SPEC['0.5'].i18n.de.opt;
+  for (const [code, o] of Object.entries(de)) {
+    const letter = code.includes(':') ? code.split(':')[1][0] : code;
+    const words = o.lbl.replace(/[()+]/g, ' ').split(/\s+/).filter(Boolean);
+    assert.ok(words.some(w => w[0] === letter), `${code}: ${o.lbl}`);
+  }
+});
+
 test('Markdown code span picks a longer fence when the code contains backticks', () => {
   assert.equal(core.mdCodeSpan('a`b'), '``a`b``');
   assert.equal(core.mdCodeSpan('`a'), '`` `a ``');

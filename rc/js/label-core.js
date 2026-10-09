@@ -114,8 +114,9 @@ function validate(input, v) {
     if (spec.rules.dateRequired) {
       if (!named.length || named.some(t => !DATE_RE.test(toolDate(t)))) missing.add('date');
     }
-    if (!n.host) missing.add('host');
-    if (!n.review) missing.add('review');
+    // read from the input: while the extent is still open, normalize() leaves these empty
+    if (!effectiveHost(input.host, spec)) missing.add('host');
+    if (!isCode(spec, 'review', input.review)) missing.add('review');
   }
   if (!n.acc || (n.stamm === 'N' && !spec.rules.noAiAcc.includes(n.acc))) missing.add('acc');
   return MISSING_ORDER.filter(k => missing.has(k));
@@ -298,11 +299,8 @@ function buildSentence(state, lang, variant = 'text', v) {
   const parts = [t.sentence.stamm[n.stamm]];
   if (!isN && n.p) parts.push(fill(t.sentence.purpose, { p: n.p }));
   if (!isN && n.review) parts.push(reviewSet[n.review]);
+  // The tools are part of the code, not of the sentence
   parts.push(n.rp ? fill(t.sentence.resp, { rp: n.rp }) : t.sentence.acc[n.acc]);
-  if (!isN && n.tools.length) {
-    const list = n.tools.map(x => `${x.name} (${x.date})`).join('; ');
-    parts.push(fill(n.tools.length > 1 ? t.sentence.tools : t.sentence.tool, { list }));
-  }
   return parts.join(' ');
 }
 
@@ -358,6 +356,27 @@ function helperNext(answers, enableM) {
   return a.q3 == null ? 'q3' : null;
 }
 
+// ── Hosting helper "Not sure?": did the input leave your organisation?
+// answers: { left: true|false, to: 'public'|'company', contract: 'yes'|'no'|'unknown' }
+function hostHelperResult(answers) {
+  const a = answers || {};
+  if (a.left == null) return null;
+  if (a.left === false) return 'H:L';
+  if (a.to == null) return null;
+  if (a.to === 'public') return 'H:I';
+  if (a.contract == null) return null;
+  return a.contract === 'yes' ? 'H:C' : 'H:C!';
+}
+
+function hostHelperNext(answers) {
+  const a = answers || {};
+  if (a.left == null) return 'left';
+  if (a.left === false) return null;
+  if (a.to == null) return 'to';
+  if (a.to === 'public') return null;
+  return a.contract == null ? 'contract' : null;
+}
+
 // ── Host suggestion from chosen services (E4): union of the services' hosts
 function suggestedHosts(serviceEntries) {
   const hosts = [];
@@ -372,8 +391,10 @@ function escHtml(s) {
 }
 const escAttr = escHtml;
 
-function escMd(s) {
-  return String(s).replace(/[\\[\]()*_`]/g, '\\$&');
+// opts.parens: false leaves ( ) alone – safe in running text, where no "](" can form
+function escMd(s, opts = {}) {
+  const re = opts.parens === false ? /[\\[\]*_`]/g : /[\\[\]()*_`]/g;
+  return String(s).replace(re, '\\$&');
 }
 
 const LATEX_TEXT = {
@@ -456,7 +477,8 @@ function buildExport(fmt, input, opts = {}) {
         `<meta name="ai-dtl" content="${escAttr(code)}">`;
     }
     case 'md': {
-      const s = linkedSentence(sentence, n.rp, resp, escMd, seg => `[${escMd(seg.text)}](${seg.url})`);
+      const escText = x => escMd(x, { parens: false });
+      const s = linkedSentence(sentence, n.rp, resp, escText, seg => `[${escMd(seg.text)}](${seg.url})`);
       return `> ${s}\n> [${mdCodeSpan(code)}](${url})`;
     }
     case 'latex': {
@@ -477,7 +499,7 @@ return {
   getSpec, isCode, fill, effectiveStamm, effectiveHost, cleanFreeText, isValidToolName, stripToolChars,
   TOOL_FORBIDDEN, DATE_RE, normalize, validate, buildCode, parseCode, toParams, buildURL, fromParams,
   idSegments, stripIds, buildSentence, warnings, warningRules, euIconSuggestion, art50Hint,
-  helperResult, helperNext, suggestedHosts, escHtml, escAttr, escMd, escLatexText, escLatexUrl,
+  helperResult, helperNext, hostHelperResult, hostHelperNext, suggestedHosts, escHtml, escAttr, escMd, escLatexText, escLatexUrl,
   mdCodeSpan, buildExport,
 };
 })();

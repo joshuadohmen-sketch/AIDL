@@ -10,7 +10,7 @@ const ICONS = {
   // S: ideas & structure – lightbulb + spark (spark same size as A's)
   S: `<path d="M10.5 4.5a5 5 0 00-3.3 8.7c.7.65 1.2 1.4 1.2 2.3h4.2c0-.9.5-1.65 1.2-2.3A5 5 0 0010.5 4.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.6 18h3.8M9.4 20.2h2.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 1.5L19.9 3.9 22.3 4.8 19.9 5.7 19 8.1 18.1 5.7 15.7 4.8 18.1 3.9Z" fill="currentColor"/>`,
   // M: existing work modified – picture frame with a pencil and a small spark (same spark as A)
-  M: `<rect x="2.6" y="6.6" width="13.4" height="13.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.2 16.8l.8-3 5.6-5.6 2.2 2.2-5.6 5.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M18.7 1.8L19.6 4.2 22 5.1 19.6 6 18.7 8.4 17.8 6 15.4 5.1 17.8 4.2 Z" fill="currentColor"/>`,
+  M: `<rect x="2.6" y="6.6" width="13.4" height="13.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.9 16.1l.5-1.9 4-4 1.4 1.4-4 4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M18.7 1.8L19.6 4.2 22 5.1 19.6 6 18.7 8.4 17.8 6 15.4 5.1 17.8 4.2 Z" fill="currentColor"/>`,
   // G: generative AI – sparkles
   G: `<path d="M9.5 2.5L11.4 7.6 16.5 9.5 11.4 11.4 9.5 16.5 7.6 11.4 2.5 9.5 7.6 7.6 Z" fill="currentColor"/><path d="M18.3 13.5L19.4 16.4 22.3 17.5 19.4 18.6 18.3 21.5 17.2 18.6 14.3 17.5 17.2 16.4 Z" fill="currentColor"/>`,
 
@@ -78,7 +78,8 @@ function buildBadgeSVG(state, opts = {}) {
   }
   const last = dims.length - 1;
   const totalW = Math.ceil(centers[last] + Math.max(r, widths[last] / 2) + padX);
-  const h = r * 2 + padY + 30;
+  // with words: word, then the code in small grey type underneath
+  const h = r * 2 + padY + (words ? 42 : 30);
 
   const id = `dtl-badge-${++badgeSeq}`;
   const a11y = opts.title
@@ -108,6 +109,11 @@ function buildBadgeSVG(state, opts = {}) {
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="#000000"/>
       <g transform="translate(${cx - 12},${cy - 12})">${iconPaths}</g>
       <text x="${cx}" y="${cy + r + 16}" text-anchor="middle" ${text}>${svgEsc(caption(code))}</text>`;
+    if (words) {
+      body += `
+      <text x="${cx}" y="${cy + r + 29}" text-anchor="middle" font-family="'Courier New',monospace"
+            font-size="9" font-weight="700" fill="#6e6e6e">${svgEsc(code)}</text>`;
+    }
   });
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${h}" width="${totalW}" class="dtl-badge"${a11y}>${body}

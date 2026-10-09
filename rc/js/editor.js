@@ -23,7 +23,9 @@ const freshState = () => ({
 const S = freshState();
 let lang = 'de';
 let helperAnswers = {};
+let hostHelperAnswers = {};
 let art50AutoOpened = false;
+let touched = false; // the missing-fields list appears only after the first input
 const rowHint = {}; // tool row index → 'bad_chars'
 
 // ── Small helpers
@@ -31,7 +33,9 @@ const $ = sel => document.querySelector(sel);
 const tr = () => SPEC_V.i18n[lang];
 const txt = path => path.split('.').reduce((o, k) => (o == null ? o : o[k]), tr());
 const fillT = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
-const codeLabel = code => `${tr().opt[code].lbl} (${code})`;
+// "H:C (Kommerziell mit Vertrag)" – the English key word in brackets is dropped here
+const shortLabel = code => tr().opt[code].lbl.replace(/\s*\([^)]*\)$/, '');
+const codeLabel = code => `${code} (${shortLabel(code)})`;
 
 function el(tag, props, ...children) {
   const node = document.createElement(tag);
@@ -72,9 +76,10 @@ function buildOptions() {
         el('span', { className: 'opt-body' },
           el('span', { className: `opt-mark ${INPUT_TYPE[dim] === 'checkbox' ? 'square' : 'round'}`, attrs: { 'aria-hidden': 'true' } }),
           icon,
-          el('span', { className: 'code', id: `${id}-c` }, code),
-          el('span', { className: 'lbl', id: `${id}-l` }),
-          el('span', { className: 'dsc', id: `${id}-d` })));
+          el('span', { className: 'opt-text' },
+            el('span', { className: 'code', id: `${id}-c` }, code),
+            el('span', { className: 'lbl', id: `${id}-l` }),
+            el('span', { className: 'dsc', id: `${id}-d` }))));
     }));
   });
 }
@@ -131,12 +136,12 @@ function applyTexts() {
   $('#btn-de').setAttribute('aria-pressed', String(lang === 'de'));
   $('#btn-en').setAttribute('aria-pressed', String(lang === 'en'));
 
-  // Example list
-  const sel = $('#example-select');
-  const current = sel.value;
-  sel.replaceChildren(el('option', { value: '' }, t.ui.example_none),
-    ...EXAMPLES.map(ex => el('option', { value: ex.id }, `${ex.id.replace('D.', '')} · ${ex.title[lang]}`)));
-  sel.value = current;
+  // Examples (link at the end of the page)
+  $('#examples-list').replaceChildren(...EXAMPLES.map(ex => {
+    const b = el('button', { type: 'button', className: 'link-btn' }, ex.title[lang]);
+    b.addEventListener('click', () => loadExample(ex.id));
+    return el('li', {}, b);
+  }));
 
   // "When does the editor show hints?" – generated from the same rules as the hints
   $('#when-body').replaceChildren(el('ul', {},
@@ -149,9 +154,11 @@ function applyTexts() {
 
 function setLang(l) {
   lang = l;
+  $('#copy-status').textContent = '';
   applyTexts();
   renderToolRows();
   renderHelper();
+  renderHostHelper();
   update();
 }
 
@@ -319,7 +326,7 @@ function renderToolHints() {
       const svc = tool.service;
       if (!svc || !svc.host) return;
       const service = svc.hint ? `${svc.name} (${svc.hint[lang]})` : svc.name;
-      notes.push(el('p', { className: 'hint' }, fillT(t.tools.host_suggest, { host: t.opt[svc.host].lbl, service })));
+      notes.push(el('p', { className: 'hint' }, fillT(t.tools.host_suggest, { host: codeLabel(svc.host), service })));
     });
   }
   $('#tool-hints').replaceChildren(...notes);
@@ -367,6 +374,51 @@ function renderHelper() {
   $('#helper-body').replaceChildren(...nodes);
 }
 
+// ── Hosting helper "Not sure?": did the input leave your organisation?
+function renderHostHelper() {
+  const hh = tr().host_helper, h = tr().helper, ui = tr().ui;
+  const QUESTIONS = {
+    left: { text: hh.left, choices: [[true, ui.yes], [false, ui.no]] },
+    to: { text: hh.to, choices: [['public', hh.to_public], ['company', hh.to_company]] },
+    contract: { text: hh.contract, choices: [['yes', ui.yes], ['no', ui.no], ['unknown', ui.dont_know]] },
+  };
+  const btn = (label, onClick, cls = 'btn-secondary') => {
+    const b = el('button', { type: 'button', className: cls }, label);
+    b.addEventListener('click', onClick);
+    return b;
+  };
+  const nodes = [];
+  ['left', 'to', 'contract'].forEach(q => {
+    const v = hostHelperAnswers[q];
+    if (v == null) return;
+    const label = QUESTIONS[q].choices.find(([val]) => val === v)[1];
+    nodes.push(el('p', { className: 'helper-done' }, `${QUESTIONS[q].text} `, el('strong', {}, label)));
+  });
+  const next = LabelCore.hostHelperNext(hostHelperAnswers);
+  if (next) {
+    nodes.push(el('p', { className: 'helper-q' }, QUESTIONS[next].text));
+    nodes.push(el('div', { className: 'helper-btns' }, ...QUESTIONS[next].choices.map(([v, l]) => btn(l, () => {
+      hostHelperAnswers[next] = v;
+      renderHostHelper();
+      $('#host-helper-body button').focus();
+    }))));
+  } else {
+    const code = LabelCore.hostHelperResult(hostHelperAnswers);
+    nodes.push(el('p', { className: 'helper-result' }, fillT(h.result, { X: codeLabel(code) })));
+    nodes.push(el('div', { className: 'helper-btns' },
+      btn(h.apply, () => {
+        S.host = [code];
+        S.hostSource = 'user';
+        touched = true;
+        syncForm();
+        update();
+        optInput('host', code).focus();
+      }, 'btn-primary'),
+      btn(h.again, () => { hostHelperAnswers = {}; renderHostHelper(); $('#host-helper-body button').focus(); })));
+  }
+  $('#host-helper-body').replaceChildren(...nodes);
+}
+
 // ── Art. 50 box (A.8)
 function renderArt50(n) {
   const box = $('#art50');
@@ -409,6 +461,9 @@ function renderResult(n) {
 
   if (ok) {
     $('#missing').replaceChildren();
+  } else if (!touched) {
+    // neutral placeholder before the first input
+    $('#missing').replaceChildren(el('p', { className: 'result-placeholder' }, t.ui.result_placeholder));
   } else {
     const [before, after = ''] = t.missing.title.split('{list}');
     const nodes = [
@@ -444,6 +499,9 @@ function renderResult(n) {
     ? [el('ul', {}, ...active.map(id => el('li', {}, t.warn[id])))]
     : []));
   $('#hints').hidden = !active.length;
+
+  // Part labels matter only when AI content is in the work
+  $('#part-label').hidden = !(n.stamm === 'M' || n.stamm === 'G');
 }
 
 function focusField(key) {
@@ -554,13 +612,16 @@ function loadState(next, opts = {}) {
   Object.assign(S, freshState(), next);
   if (!S.tools.length) S.tools = [emptyTool()];
   helperAnswers = {};
+  hostHelperAnswers = {};
   art50AutoOpened = false;
+  touched = opts.touched !== false;
   Object.keys(rowHint).forEach(k => delete rowHint[k]);
   $('#legacy-notice').hidden = !opts.legacy;
   if (opts.legacy) $('#legacy-notice').textContent = tr().ui.legacy_loaded;
   syncForm();
   renderToolRows();
   renderHelper();
+  renderHostHelper();
   update();
 }
 
@@ -573,13 +634,17 @@ function loadExample(id) {
     tools: ex.state.tools.map(tl => ({ ...tl, service: null })),
     hostSource: 'user',
   });
+  $('#examples').open = false;
+  const first = document.querySelector('#step-stamm .opt-input');
+  first.closest('fieldset').scrollIntoView({ block: 'start' });
+  first.focus({ preventScroll: true });
 }
 
 function restart() {
-  $('#example-select').value = '';
   $('#helper').open = false;
+  $('#host-helper').open = false;
   $('#art50').open = false;
-  loadState({});
+  loadState({}, { touched: false });
   const first = document.querySelector('#step-stamm .opt-input');
   first.closest('fieldset').scrollIntoView({ block: 'start' });
   first.focus({ preventScroll: true });
@@ -610,6 +675,8 @@ function init() {
   buildOptions();
 
   $('#editor').addEventListener('submit', e => e.preventDefault());
+  // capture phase: runs before the field handlers, so the first input already counts
+  ['input', 'change'].forEach(type => $('#editor').addEventListener(type, () => { touched = true; }, true));
   $('#editor').addEventListener('change', e => {
     if (e.target.classList.contains('opt-input')) onOptionChange(e.target);
   });
@@ -631,7 +698,6 @@ function init() {
   }));
   $('#add-tool-btn').addEventListener('click', addTool);
   $('#restart-btn').addEventListener('click', restart);
-  $('#example-select').addEventListener('change', e => loadExample(e.target.value));
   $('#btn-de').addEventListener('click', () => setLang('de'));
   $('#btn-en').addEventListener('click', () => setLang('en'));
   document.querySelectorAll('#copy-row .copy-btn').forEach(b => b.addEventListener('click', () => onExport(b)));
@@ -645,7 +711,7 @@ function init() {
 
   if (STUDY) {
     $('#study-banner').hidden = false;
-    $('#example-wrap').hidden = true;
+    $('#examples').hidden = true;
     $('#restart-btn').classList.add('btn-primary');
     $('#study-copy').hidden = false;
   }
@@ -653,6 +719,7 @@ function init() {
   applyTexts();
   renderToolRows();
   renderHelper();
+  renderHostHelper();
   update();
   loadFromParams();
 }

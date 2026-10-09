@@ -32,8 +32,9 @@ js/
 tests/                Node-Tests für die Wurzel
 rc/                   Release-Kandidat 0.5 – eigene Kopie, Wurzel bleibt 0.4.1
   index.html          Editor 0.5 (Formularelemente, Studienmodus)
-  label/index.html    Erklärseite 0.5 (zeigt auch 0.4-Links mit Hinweis)
-  css/style.css       Gestaltung 0.5 (ohne Google Fonts, Schrift aus rc/fonts/)
+  label/index.html    Erklärseite 0.5 (zeigt auch 0.4-Links mit Hinweis; ohne Parameter:
+                      Übersicht aller Stufen mit Grenzfällen, Ziel von „Mehr zu den Stufen“)
+  css/style.css       Gestaltung 0.5 (keine Webfonts: Open Sans, falls installiert, sonst Arial)
   js/services.js      Dienste und Modelle mit Host-Vorschlägen (ersetzt tools.js)
   js/editor.js        Editor 0.5
   tests/              Node-Tests für den Kandidaten inkl. Export-Snapshots

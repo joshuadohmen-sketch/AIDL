@@ -30,6 +30,11 @@
     .info-card { background: var(--white); border: 1px solid var(--g200); border-radius: 8px; padding: 1rem 1.25rem; }
     .info-card p { max-width: 70ch; }
     .info-card ul { padding-left: 1.2rem; }
+    .info-card p + p { margin-top: .5rem; }
+    .overview-title { font-size: 1.4rem; font-weight: 800; }
+    .cases-title { font-size: .95rem; font-weight: 700; margin: 1rem 0 .5rem; }
+    .cases li { font-size: .89rem; }
+    .cases li + li { margin-top: .3rem; }
     .cta { margin-top: 2rem; }
     .cta a { display: inline-block; background: var(--black); color: var(--white); text-decoration: none; font-weight: 700; padding: .6rem 1.2rem; border-radius: 4px; }
     .cta a:hover { background: var(--g700); }
@@ -55,7 +60,7 @@
 
 <div class="page">
   <footer>
-    <span>AI-DTL Working Draft 0.5 (Vorschau) · <a href="https://joshuadohmen-sketch.github.io/AIDL/changelog/">Changelog</a></span>
+    <span><span id="footer-draft">AI-DTL Working Draft 0.5 (Vorschau)</span> · <a href="https://joshuadohmen-sketch.github.io/AIDL/changelog/">Changelog</a></span>
     <span>
       <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> ·
       <a href="https://github.com/joshuadohmen-sketch/AIDL/issues">Feedback</a> ·
@@ -102,16 +107,52 @@ function sentenceNodes(t, sentence, rp) {
   return [sentence.slice(0, rpAt), ...parts, sentence.slice(rpAt + rp.length)];
 }
 
+// Without parameters: overview of all levels, borderline cases and the hosting rule
+function renderOverview(t, root, cta) {
+  document.title = 'AI-DTL – ' + t.page.overview_title;
+  const spec = SPEC['0.5'];
+  const nodes = [
+    el('h1', { className: 'overview-title' }, t.page.overview_title),
+    el('p', { className: 'page-sub' }, t.page.overview_sub),
+  ];
+  ['stamm', 'host', 'review', 'acc'].forEach(dim => {
+    nodes.push(el('h2', { className: 'section-title' }, t.steps[dim].title));
+    spec.order[dim].forEach(c => nodes.push(dimCard(c, t.opt[c].lbl, t.opt[c].dsc)));
+    if (dim === 'stamm') {
+      nodes.push(el('h3', { className: 'cases-title' }, t.page.cases_title));
+      nodes.push(el('div', { className: 'info-card' }, el('ul', { className: 'cases' },
+        ...t.page.cases.map(([situation, code, reason]) =>
+          el('li', {}, el('strong', {}, `${code} (${t.opt[code].lbl.replace(/\s*\([^)]*\)$/, '')})`), ` · ${situation} – ${reason}`)))));
+    }
+    if (dim === 'host') {
+      nodes.push(el('div', { className: 'info-card' }, el('p', {}, t.page.host_rule), el('p', {}, t.host_hint)));
+    }
+  });
+  nodes.push(el('h2', { className: 'section-title' }, t.page.not_says_title));
+  nodes.push(el('div', { className: 'info-card' }, el('p', {}, t.page.not_says)));
+  nodes.push(el('h2', { className: 'section-title' }, t.page.eu_title));
+  nodes.push(el('div', { className: 'info-card' }, el('p', {}, t.page.eu)));
+  nodes.push(cta);
+  root.replaceChildren(...nodes);
+}
+
 function render() {
   const t05 = SPEC['0.5'].i18n[lang];
   const root = document.getElementById('content');
   document.documentElement.lang = lang;
   document.getElementById('header-version').textContent = t05.ui.header_version;
+  document.getElementById('footer-draft').textContent = t05.ui.footer_draft;
   document.getElementById('btn-de').setAttribute('aria-pressed', String(lang === 'de'));
   document.getElementById('btn-en').setAttribute('aria-pressed', String(lang === 'en'));
 
-  const r = LabelCore.fromParams(new URLSearchParams(window.location.search));
+  const params = new URLSearchParams(window.location.search);
   const cta = el('div', { className: 'cta' }, el('a', { href: '../' }, t05.page.create_own));
+
+  if (!params.has('s')) {
+    renderOverview(t05, root, cta);
+    return;
+  }
+  const r = LabelCore.fromParams(params);
 
   if (!r) {
     // never echo the input

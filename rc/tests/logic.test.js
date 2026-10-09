@@ -26,6 +26,7 @@ test('validation lists what is missing, in step order', () => {
   assert.deepEqual(core.validate({ stamm: [], host: [], tools: [] }, '0.5'),
     ['stamm', 'tool', 'date', 'host', 'review', 'acc']);
   assert.deepEqual(core.validate(G({ tools: [] }), '0.5'), ['tool', 'date']);
+  assert.deepEqual(core.validate(G({ stamm: [] }), '0.5'), ['stamm']);
   assert.deepEqual(core.validate(G({ tools: [{ name: 'GPT-5', month: '05', year: '' }] }), '0.5'), ['date']);
   assert.deepEqual(core.validate(G({ tools: [{ name: 'GPT (5)', month: '05', year: '2026' }] }), '0.5'), ['tool']);
   assert.deepEqual(core.validate({ stamm: ['N'], acc: 'Acc:N' }, '0.5'), ['acc']);
@@ -102,6 +103,33 @@ test('ORCID and ROR are recognised', () => {
   assert.equal(core.stripIds('Universität Koblenz (05qpz1x62)'), 'Universität Koblenz');
 });
 
+test('hosting helper: did the input leave your organisation?', () => {
+  assert.equal(core.hostHelperResult({ left: false }), 'H:L');
+  assert.equal(core.hostHelperResult({ left: true, to: 'public' }), 'H:I');
+  assert.equal(core.hostHelperResult({ left: true, to: 'company', contract: 'yes' }), 'H:C');
+  assert.equal(core.hostHelperResult({ left: true, to: 'company', contract: 'no' }), 'H:C!');
+  assert.equal(core.hostHelperResult({ left: true, to: 'company', contract: 'unknown' }), 'H:C!');
+  assert.equal(core.hostHelperResult({ left: true, to: 'company' }), null);
+  assert.equal(core.hostHelperResult({}), null);
+  assert.equal(core.hostHelperNext({}), 'left');
+  assert.equal(core.hostHelperNext({ left: true }), 'to');
+  assert.equal(core.hostHelperNext({ left: true, to: 'company' }), 'contract');
+  assert.equal(core.hostHelperNext({ left: true, to: 'public' }), null);
+  assert.equal(core.hostHelperNext({ left: false }), null);
+});
+
+test('sentence names no tools; the tools are in the code', () => {
+  const s = G({ tools: [{ name: 'GPT-5', month: '05', year: '2026' }] });
+  const n = core.normalize(s, '0.5');
+  for (const lang of ['de', 'en']) assert.ok(!core.buildSentence(n, lang, 'text', '0.5').includes('GPT-5'));
+  assert.ok(core.buildCode(s, '0.5').includes('(GPT-5, 05/2026)'));
+});
+
+test('a generic name without model ("Name/") is coded without the slash', () => {
+  const s = G({ tools: [{ name: 'Ollama/', month: '05', year: '2026' }] });
+  assert.ok(core.buildCode(s, '0.5').endsWith('(Ollama, 05/2026)'));
+});
+
 test('host suggestion is the union of the services’ hosts', () => {
   assert.deepEqual(core.suggestedHosts([{ host: 'H:I' }, { host: 'H:C' }, { host: 'H:I' }, {}]), ['H:I', 'H:C']);
 });
@@ -110,6 +138,8 @@ test('spec without M has no M texts', () => {
   const spec = buildSpec05(false);
   assert.equal(spec.order.stamm.join(''), 'NASG');
   assert.equal(spec.i18n.de.opt.M, undefined);
-  assert.equal(spec.i18n.de.opt.G.lbl, 'KI-Inhalte im Werk');
+  assert.equal(spec.i18n.de.opt.G.lbl, 'Generativ');
+  assert.ok(spec.i18n.de.opt.G.dsc.includes('verändert'));
+  assert.ok(spec.i18n.de.page.cases.every(([, code]) => code !== 'M'));
   assert.equal(spec.warnings[1].trigger, 'G + R:N');
 });

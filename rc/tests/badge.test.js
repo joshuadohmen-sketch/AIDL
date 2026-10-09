@@ -36,7 +36,8 @@ test('badge is neutral and carries title, description and metadata', () => {
 test('N badge has no AI pictogram', () => {
   const svg = buildBadgeSVG({ stamm: 'N', acc: 'Acc:I' }, { version: '0.5', words: t.badge, title: 'AI-DTL 0.5: N/Acc:I' });
   assert.ok(!svg.includes(ICONS.G) && !svg.includes(ICONS.A));
-  assert.ok(svg.includes('>ohne KI<'));
+  assert.ok(svg.includes('>keine KI<'));
+  assert.ok(svg.includes('>N<'), 'code under the word');
 });
 
 test('circles keep at least 84 px distance so words do not overlap', () => {
