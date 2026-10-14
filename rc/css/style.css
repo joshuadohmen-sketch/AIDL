@@ -1,7 +1,7 @@
 /* ── AI-DTL 0.5 (release candidate) ──────────────────────────────────────────
    The look of 0.4 (black header with red rule, white step cards, compact option
    cards), the functions of 0.5 on native form controls.
-   1rem = 18px; running text ≥ 16px, small text ≥ 14px.
+   1rem = 19px; running text ≥ 16px.
    No web fonts are loaded (no third-party requests): Open Sans if installed, else Arial. */
 
 :root {
@@ -18,11 +18,11 @@
   --note-border: #d9c88f;
   --font: 'Open Sans', Arial, Helvetica, sans-serif;
   --mono: 'Courier New', Courier, monospace;
-  --max: 920px;
+  --max: 960px;
   --focus: 3px solid var(--red);
 }
 
-html { font-size: 112.5%; }
+html { font-size: 118.75%; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -137,7 +137,8 @@ input::placeholder { color: var(--g400); opacity: 1; }
 }
 .step-num::before { content: attr(data-word) "\00a0" counter(step); }
 .step-title { font-size: 1rem; font-weight: 700; line-height: 1.3; }
-.step-sub { color: var(--g400); font-size: .83rem; margin-top: .1rem; }
+/* guiding question: dark; selection note: small, italic, grey, closer to the cards */
+.step-sub { color: var(--g700); font-size: .89rem; margin-top: .1rem; }
 
 .unsure-link {
   position: absolute; top: 1rem; right: 1.25rem;
@@ -146,7 +147,7 @@ input::placeholder { color: var(--g400); opacity: 1; }
 }
 .unsure-link[aria-expanded="true"] { font-weight: 700; }
 
-.select-note { font-size: .78rem; color: var(--g400); margin: .4rem 0 .4rem; }
+.select-note { font-size: .72rem; font-style: italic; color: var(--g400); margin: .7rem 0 .25rem; }
 
 /* ── Option cards ────────────────────────────────────────────────────────── */
 /* Wide screens: one row per step; --cols is set per dimension by the editor */

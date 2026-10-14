@@ -18,8 +18,8 @@ const EXAMPLES = [
   {
     id: 'D.3',
     title: { de: 'Bericht mit dem KI-Chat der eigenen Organisation, selbst betrieben', en: 'Report with your own organisation’s AI chat, self-hosted' },
-    state: { stamm: ['S'], host: ['H:L'], review: 'R:H', acc: 'Acc:I', tools: [{ name: 'KI-Chat der eigenen Organisation/offenes Modell', month: '05', year: '2026' }] },
-    code: 'AI-DTL 0.5: S/H:L;R:H;Acc:I (KI-Chat der eigenen Organisation/offenes Modell, 05/2026)',
+    state: { stamm: ['S'], host: ['H:I'], review: 'R:H', acc: 'Acc:I', tools: [{ name: 'KI-Chat der eigenen Organisation/offenes Modell', month: '05', year: '2026' }] },
+    code: 'AI-DTL 0.5: S/H:I;R:H;Acc:I (KI-Chat der eigenen Organisation/offenes Modell, 05/2026)',
   },
   {
     id: 'D.4',

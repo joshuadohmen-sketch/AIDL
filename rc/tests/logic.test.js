@@ -126,19 +126,47 @@ test('ORCID and ROR are recognised', () => {
   assert.equal(core.stripIds('Universität Koblenz (05qpz1x62)'), 'Universität Koblenz');
 });
 
-test('hosting helper: did the input leave your organisation?', () => {
-  assert.equal(core.hostHelperResult({ left: false }), 'H:L');
-  assert.equal(core.hostHelperResult({ left: true, to: 'public' }), 'H:I');
-  assert.equal(core.hostHelperResult({ left: true, to: 'company', contract: 'yes' }), 'H:C');
-  assert.equal(core.hostHelperResult({ left: true, to: 'company', contract: 'no' }), 'H:C!');
-  assert.equal(core.hostHelperResult({ left: true, to: 'company', contract: 'unknown' }), 'H:C!');
-  assert.equal(core.hostHelperResult({ left: true, to: 'company' }), null);
+test('hosting helper follows the DFG variants: who operates the system?', () => {
+  assert.equal(core.hostHelperResult({ device: true }), 'H:L');
+  assert.equal(core.hostHelperResult({ device: false, operator: 'institution' }), 'H:I');
+  assert.equal(core.hostHelperResult({ device: false, operator: 'company', contract: 'yes' }), 'H:C');
+  assert.equal(core.hostHelperResult({ device: false, operator: 'company', contract: 'no' }), 'H:C!');
+  assert.equal(core.hostHelperResult({ device: false, operator: 'company', contract: 'unknown' }), 'H:C!');
+  assert.equal(core.hostHelperResult({ device: false, operator: 'company' }), null);
   assert.equal(core.hostHelperResult({}), null);
-  assert.equal(core.hostHelperNext({}), 'left');
-  assert.equal(core.hostHelperNext({ left: true }), 'to');
-  assert.equal(core.hostHelperNext({ left: true, to: 'company' }), 'contract');
-  assert.equal(core.hostHelperNext({ left: true, to: 'public' }), null);
-  assert.equal(core.hostHelperNext({ left: false }), null);
+  assert.equal(core.hostHelperNext({}), 'device');
+  assert.equal(core.hostHelperNext({ device: true }), null);
+  assert.equal(core.hostHelperNext({ device: false }), 'operator');
+  assert.equal(core.hostHelperNext({ device: false, operator: 'institution' }), null);
+  assert.equal(core.hostHelperNext({ device: false, operator: 'company' }), 'contract');
+});
+
+test('no option description says "rephrased"', () => {
+  const { SPEC, buildSpec05 } = require('../js/spec.js');
+  for (const spec of [SPEC['0.5'], buildSpec05(false)]) {
+    for (const lang of ['de', 'en']) {
+      for (const [code, o] of Object.entries(spec.i18n[lang].opt)) {
+        assert.ok(!/umformul|rephras/i.test(o.dsc), `${lang} ${code}: ${o.dsc}`);
+      }
+    }
+  }
+});
+
+test('groups.stamm covers A, S, M and G exactly once', () => {
+  const { SPEC, buildSpec05 } = require('../js/spec.js');
+  const members = spec => Object.values(spec.groups.stamm).flat().sort().join('');
+  assert.equal(members(SPEC['0.5']), 'AGMS');
+  assert.equal(members(buildSpec05(false)), 'AGS');
+  assert.equal(SPEC['0.5'].groups.host, undefined);
+});
+
+test('no service with a server hint suggests Local', () => {
+  const { SERVICES } = require('../js/services.js');
+  for (const g of SERVICES) {
+    for (const s of g.items) {
+      if (s.host === 'H:L') assert.ok(!/server/i.test(`${s.hint?.de} ${s.hint?.en}`), `${s.name}: ${s.hint?.de}`);
+    }
+  }
 });
 
 test('sentence names no tools; the tools are in the code', () => {
@@ -165,7 +193,7 @@ test('spec without M has no M texts', () => {
   assert.equal(spec.i18n.de.opt.G.dsc, 'Inhalt neu erzeugt oder Ihr Werk verändert');
   assert.equal(spec.i18n.en.opt.G.dsc, 'New content generated or your work changed');
   assert.ok(spec.i18n.de.page.cases.every(([, code]) => code !== 'M'));
-  assert.deepEqual(spec.groups, { none: ['A', 'S'], ai: ['G'] });
+  assert.deepEqual(spec.groups.stamm, { none: ['A', 'S'], ai: ['G'] });
   assert.equal(spec.i18n.de.helper.q2, undefined);
   assert.equal(spec.warnings[1].trigger, 'G + R:N');
 });

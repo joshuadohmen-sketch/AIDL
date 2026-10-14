@@ -359,24 +359,27 @@ function helperNext(answers, enableM) {
   return a.q4 == null ? 'q4' : null;
 }
 
-// ── Hosting helper "Not sure?": did the input leave your organisation?
-// answers: { left: true|false, to: 'public'|'company', contract: 'yes'|'no'|'unknown' }
+// ── Hosting helper "Not sure?": who operates the AI system?
+// Follows the three variants of the DFG guideline on AI in peer review (form 4.04):
+// only on your own device → H:L; operated by a trustworthy institution, your own included → H:I;
+// a company as provider → H:C with a contract that rules out the use of your input, else H:C!.
+// answers: { device: true|false, operator: 'institution'|'company', contract: 'yes'|'no'|'unknown' }
 function hostHelperResult(answers) {
   const a = answers || {};
-  if (a.left == null) return null;
-  if (a.left === false) return 'H:L';
-  if (a.to == null) return null;
-  if (a.to === 'public') return 'H:I';
+  if (a.device == null) return null;
+  if (a.device === true) return 'H:L';
+  if (a.operator == null) return null;
+  if (a.operator === 'institution') return 'H:I';
   if (a.contract == null) return null;
   return a.contract === 'yes' ? 'H:C' : 'H:C!';
 }
 
 function hostHelperNext(answers) {
   const a = answers || {};
-  if (a.left == null) return 'left';
-  if (a.left === false) return null;
-  if (a.to == null) return 'to';
-  if (a.to === 'public') return null;
+  if (a.device == null) return 'device';
+  if (a.device === true) return null;
+  if (a.operator == null) return 'operator';
+  if (a.operator === 'institution') return null;
   return a.contract == null ? 'contract' : null;
 }
 

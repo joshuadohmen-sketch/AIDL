@@ -35,6 +35,11 @@
     .cases-title { font-size: .95rem; font-weight: 700; margin: 1rem 0 .5rem; }
     .group-title { font-size: .83rem; font-weight: 600; color: var(--g400); margin: .8rem 0 .4rem; border-bottom: 1px solid var(--g300); padding-bottom: 2px; }
     .principles { margin-bottom: .6rem; }
+    .am-original { font-size: .89rem; margin-bottom: .6rem; }
+    .table-wrap { overflow-x: auto; }
+    .am-table { border-collapse: collapse; width: 100%; font-size: .86rem; }
+    .am-table th, .am-table td { text-align: left; vertical-align: top; padding: .4rem .6rem; border-bottom: 1px solid var(--g200); }
+    .am-table th { font-weight: 700; color: var(--g700); }
     .principles li { font-weight: 600; }
     .cases li { font-size: .89rem; }
     .cases li + li { margin-top: .3rem; }
@@ -124,7 +129,7 @@ function renderOverview(t, root, cta) {
       // the three guiding sentences, then the cards in their groups
       nodes.push(el('div', { className: 'info-card principles' }, el('ul', {}, ...t.page.principles.map(p => el('li', {}, p)))));
       spec.order.stamm.forEach(c => {
-        const group = Object.keys(spec.groups).find(g => spec.groups[g][0] === c);
+        const group = Object.keys(spec.groups.stamm).find(g => spec.groups.stamm[g][0] === c);
         if (group) nodes.push(el('h3', { className: 'group-title' }, group === 'none' ? t.ui.group_none : t.ui.group_ai));
         nodes.push(dimCard(c, t.opt[c].lbl, t.opt[c].dsc));
       });
@@ -132,12 +137,21 @@ function renderOverview(t, root, cta) {
       nodes.push(el('div', { className: 'info-card' }, el('ul', { className: 'cases' },
         ...t.page.cases.map(([situation, code, reason]) =>
           el('li', {}, el('strong', {}, `${code} ${t.opt[code].lbl}`), ` · ${situation}: ${reason}`)))));
+      // small example for the line between A (how) and M (what)
+      const ex = t.page.am_example;
+      nodes.push(el('h3', { className: 'cases-title' }, ex.title));
+      nodes.push(el('div', { className: 'info-card' },
+        el('p', { className: 'am-original' }, el('strong', {}, ex.original_label),
+          lang === 'en' ? ` “${ex.original}”` : ` „${ex.original}“`),
+        el('div', { className: 'table-wrap' }, el('table', { className: 'am-table' },
+          el('thead', {}, el('tr', {}, ...ex.head.map(h => el('th', { scope: 'col' }, h)))),
+          el('tbody', {}, ...ex.rows.map(row => el('tr', {}, ...row.map(cell => el('td', {}, cell)))))))));
       return;
     }
     spec.order[dim].forEach(c => nodes.push(dimCard(c, t.opt[c].lbl, t.opt[c].dsc)));
     if (dim === 'host') {
       nodes.push(el('div', { className: 'info-card' },
-        el('p', {}, t.host_helper.intro), el('p', {}, t.host_rule), el('p', {}, t.host_hint)));
+        el('p', {}, t.host_helper.intro), el('p', {}, t.host_rule), el('p', {}, t.host_hint), el('p', {}, t.host_relay)));
     }
   });
   // moved here from the editor: generated from the same rules as the hints

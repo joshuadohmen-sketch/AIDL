@@ -281,12 +281,12 @@ function buildSpec05(enableM) {
     },
     opt: opt({
       N: 'Ohne KI entstanden',
-      A: 'Nur Sprache und Form: Korrektur, Sprachpolitur, Übersetzung',
+      A: 'Nur Sprache und Form, die Aussage bleibt: Korrektur, Sprachpolitur, Übersetzung',
       S: 'Vorarbeit: Ideen, Gliederung, Recherche',
-      M: 'Ihr vorhandenes Werk inhaltlich verändert, z. B. umformuliert oder retuschiert',
+      M: 'Ihr Werk inhaltlich verändert: gekürzt, umgebaut, retuschiert',
       G: enableM ? 'Inhalt neu erzeugt: Text, Code, Bild, Ton' : 'Inhalt neu erzeugt oder Ihr Werk verändert',
-      'H:L': 'Eigenes Gerät oder Server der eigenen Organisation. Keine Übertragung nach außen',
-      'H:I': 'Vertrauenswürdige öffentliche Einrichtung, z. B. Rechenzentrum einer Hochschule oder Behörde',
+      'H:L': 'Nur auf Ihrem eigenen Gerät, keine Datenübertragung (z. B. Ollama)',
+      'H:I': 'Von einer vertrauenswürdigen Einrichtung betrieben, z. B. Ihrer Hochschule, Behörde oder einer Forschungseinrichtung',
       'H:C': 'Kommerzieller Cloud-Dienst mit Auftragsverarbeitungsvertrag (AVV)',
       'H:C!': 'Kommerzieller Cloud-Dienst ohne AVV, z. B. privates oder kostenloses Konto',
       'R:H': 'Ein Mensch hat geprüft',
@@ -302,8 +302,8 @@ function buildSpec05(enableM) {
       host: 'Im Label: {X}. Bei mehreren zählt der am wenigsten geschützte Ort.',
     },
     helper: {
-      intro: 'A betrifft nur die Form, S die inhaltliche Vorarbeit. Bei M und G steckt KI-Inhalt im Werk.',
-      q1: 'Steckt im fertigen Werk Inhalt, den die KI erzeugt oder verändert hat? Korrekturen und Übersetzungen Ihres eigenen Textes zählen nicht dazu.',
+      intro: 'A betrifft nur die Form, die Aussage bleibt. S betrifft die inhaltliche Vorarbeit. Bei M und G steckt KI-Inhalt im Werk.',
+      q1: 'Steckt im fertigen Werk Inhalt, den die KI erzeugt oder verändert hat? Sprachliche Überarbeitungen, bei denen Ihre Aussage gleich bleibt, zählen nicht dazu.',
       q2: 'Hat die KI etwas Neues erzeugt, z. B. Text, Code, Bild oder eine Zusammenfassung?',
       q3: 'Hat die KI bei Ideen, Gliederung oder Recherche geholfen?',
       q4: 'Hat die KI Sprache oder Form bearbeitet, z. B. korrigiert, geglättet oder übersetzt?',
@@ -313,11 +313,11 @@ function buildSpec05(enableM) {
       more: 'Mehr zu den Stufen und Grenzfällen',
     },
     host_helper: {
-      intro: 'Entscheidend ist, ob Ihre Eingaben Ihre Organisation verlassen haben.',
-      left: 'Haben Ihre Eingaben Ihre Organisation verlassen?',
-      to: 'An wen?',
-      to_public: 'Öffentliche Einrichtung',
-      to_company: 'Unternehmen',
+      intro: 'Entscheidend ist, wer das KI-System betreibt.',
+      device: 'Lief die KI ausschließlich auf Ihrem eigenen Gerät?',
+      operator: 'Wer betreibt das System?',
+      op_institution: 'Meine Hochschule, meine Organisation oder eine andere öffentliche Einrichtung',
+      op_company: 'Ein Unternehmen, z. B. ein Cloud-Dienst',
       contract: 'Gibt es einen Vertrag, z. B. einen AVV, der die Nutzung Ihrer Eingaben für eigene Zwecke ausschließt?',
     },
     purpose: {
@@ -333,8 +333,9 @@ function buildSpec05(enableM) {
       host_suggest: 'Vorschlag für den nächsten Schritt: {host}, weil Sie „{service}“ gewählt haben. Bitte prüfen.',
       bad_chars: 'Die Zeichen ; ( ) , | sind im Werkzeugnamen nicht möglich.',
     },
-    host_hint: 'Eine Lizenz Ihrer Organisation heißt nicht, dass der Dienst auf deren Servern läuft. Meist läuft er beim Anbieter (Commercial with DPA).',
-    host_rule: 'Ein Unternehmen ist nie Institutional. Läuft die KI auf Servern der eigenen Organisation, auch eines Unternehmens, gilt Local.',
+    host_hint: 'Eine Lizenz Ihrer Organisation heißt nicht, dass sie den Dienst selbst betreibt. Meist betreibt ihn der Anbieter (Commercial with DPA).',
+    host_relay: 'Leitet der KI-Chat Ihrer Hochschule Ihre Eingaben an das Modell eines Unternehmens weiter, gilt Commercial.',
+    host_rule: 'Local heißt: nur auf Ihrem eigenen Gerät. Betreibt eine vertrauenswürdige Einrichtung das System, auch Ihre eigene Hochschule oder Organisation, gilt Institutional. Ein Unternehmen als Anbieter ist immer Commercial. Die Einteilung folgt der DFG-Leitlinie zur Nutzung von KI in der Begutachtung (Vordruck 4.04).',
     review_hint_as: 'Bei Assistive oder Supportive: Haben Sie die Vorschläge der KI bewusst angenommen oder verworfen? Dann Human.',
     resp: {
       label: 'Wer steht dafür ein?',
@@ -422,16 +423,29 @@ function buildSpec05(enableM) {
       create_own: 'Eigenes Label erstellen',
       overview_title: 'Stufen und Angaben',
       overview_sub: 'So sind die Buchstaben im Code definiert.',
-      principles: ['A betrifft nur die Form.', 'S betrifft die inhaltliche Vorarbeit.', 'Bei M und G steckt KI-Inhalt im Werk.'],
+      principles: ['A betrifft nur die Form, die Aussage bleibt.', 'S betrifft die inhaltliche Vorarbeit.', 'Bei M und G steckt KI-Inhalt im Werk.'],
       cases_title: 'Grenzfälle beim Ausmaß',
+      // A changes how something is said or shown, M changes what is said or shown
+      am_example: {
+        title: 'Beispiel: die Grenze zwischen A und M',
+        original_label: 'Originalsatz:',
+        original: 'Die Teilnehmenden fanden das Tool überwiegend hilfreich, einige hatten aber Probleme mit der Anmeldung.',
+        head: ['Was die KI macht', 'Ergebnis', 'Stufe'],
+        rows: [
+          ['Tippfehler korrigieren', 'gleicher Satz, fehlerfrei', 'A'],
+          ['Schöner formulieren', '„Die meisten bewerteten das Tool als hilfreich; vereinzelt gab es Schwierigkeiten bei der Anmeldung.“', 'A, die Aussage bleibt'],
+          ['Kürzen', '„Die Teilnehmenden fanden das Tool hilfreich.“', 'M, die Probleme fehlen jetzt'],
+        ],
+      },
       cases: [
-        ['Rechtschreibung und Grammatik korrigieren, einzelne Sätze glätten', 'A', 'nur Form'],
+        ['Rechtschreibung und Grammatik korrigieren', 'A', 'nur Form'],
+        ['Eigenen Text sprachlich glätten lassen, auch ganze Absätze', 'A', 'Aussage unverändert'],
         ['Eigenen Text übersetzen, eigene Aufnahme transkribieren', 'A', 'nur Form, Aussage unverändert'],
         ['Bildqualität verbessern', 'A', 'nur Form'],
         ['Ideen, Gliederung, Recherche, Feedback, Erklärungen', 'S', 'Vorarbeit, kein KI-Inhalt im Werk'],
         ['Fehlersuche: KI zeigt den Fehler, Sie beheben ihn selbst', 'S', 'Vorarbeit, kein KI-Inhalt im Werk'],
-        ['Eigene Absätze von KI umformulieren lassen', 'M', 'KI-Inhalt im Werk: vorhandenes Werk verändert'],
-        ['Von der KI geänderten Code übernehmen', 'M', 'KI-Inhalt im Werk: vorhandenes Werk verändert'],
+        ['Eigenen Text kürzen, umbauen oder in der Aussage zuspitzen lassen', 'M', 'KI-Inhalt im Werk: Aussage verändert'],
+        ['Von der KI geänderten Code übernehmen', 'M', 'KI-Inhalt im Werk: bei Code ist der Code selbst der Inhalt'],
         ['Foto: Objekt entfernt, Hintergrund ersetzt', 'M', 'KI-Inhalt im Werk: vorhandenes Werk verändert'],
         ['Neuer KI-Code übernommen', 'G', 'KI-Inhalt im Werk: neu erzeugt'],
         ['Zusammenfassung, Abstract, Text aus Stichpunkten', 'G', 'neu erzeugt; Stichpunkte und Prompt sind kein vorhandenes Werk'],
@@ -494,12 +508,12 @@ function buildSpec05(enableM) {
     },
     opt: opt({
       N: 'Created without AI',
-      A: 'Language and form only: proofreading, polishing, translation',
+      A: 'Language and form only, the message stays: proofreading, polishing, translation',
       S: 'Groundwork: ideas, outline, research',
-      M: 'Your existing work changed in substance, e.g. rephrased or retouched',
+      M: 'Your work changed in substance: shortened, restructured, retouched',
       G: enableM ? 'New content generated: text, code, image, audio' : 'New content generated or your work changed',
-      'H:L': 'Your device or your organisation\'s servers. Nothing leaves your organisation',
-      'H:I': 'Trustworthy public body, e.g. a university or government data centre',
+      'H:L': 'Only on your own device, no data transfer (e.g. Ollama)',
+      'H:I': 'Operated by a trustworthy institution, e.g. your university, public authority or a research institution',
       'H:C': 'Commercial cloud service with a data processing agreement (DPA)',
       'H:C!': 'Commercial cloud service without a DPA, e.g. a private or free account',
       'R:H': 'A human reviewed it',
@@ -515,8 +529,8 @@ function buildSpec05(enableM) {
       host: 'In the label: {X}. If several apply, the least protected location counts.',
     },
     helper: {
-      intro: 'A concerns form only, S the groundwork for the content. With M and G, AI content is part of the work.',
-      q1: 'Does the finished work contain content the AI generated or changed? Corrections and translations of your own text do not count.',
+      intro: 'A concerns form only, the message stays. S concerns the groundwork for the content. With M and G, AI content is part of the work.',
+      q1: 'Does the finished work contain content the AI generated or changed? Language edits that keep your message unchanged do not count.',
       q2: 'Did the AI create something new, e.g. text, code, an image or a summary?',
       q3: 'Did the AI help with ideas, outline or research?',
       q4: 'Did the AI edit language or form, e.g. correct, polish or translate?',
@@ -526,11 +540,11 @@ function buildSpec05(enableM) {
       more: 'More about the levels and borderline cases',
     },
     host_helper: {
-      intro: 'What matters is whether your input left your organisation.',
-      left: 'Did your input leave your organisation?',
-      to: 'To whom?',
-      to_public: 'Public institution',
-      to_company: 'Company',
+      intro: 'What matters is who operates the AI system.',
+      device: 'Did the AI run only on your own device?',
+      operator: 'Who operates the system?',
+      op_institution: 'My university, my organisation or another public institution',
+      op_company: 'A company, e.g. a cloud service',
       contract: 'Is there a contract, e.g. a DPA, that rules out the use of your input for the provider\'s own purposes?',
     },
     purpose: {
@@ -546,8 +560,9 @@ function buildSpec05(enableM) {
       host_suggest: 'Suggested for the next step: {host}, because you chose “{service}”. Please check.',
       bad_chars: 'The characters ; ( ) , | cannot be used in tool names.',
     },
-    host_hint: 'A licence held by your organisation does not mean the service runs on its servers. It usually runs at the provider (Commercial with DPA).',
-    host_rule: 'A company is never Institutional. If the AI runs on servers of your own organisation, a company\'s included, Local applies.',
+    host_hint: 'A licence held by your organisation does not mean it operates the service itself. Usually the provider operates it (Commercial with DPA).',
+    host_relay: 'If your university\'s AI chat passes your input on to a company\'s model, Commercial applies.',
+    host_rule: 'Local means: only on your own device. If a trustworthy institution operates the system, including your own university or organisation, Institutional applies. A company as provider is always Commercial. The classification follows the DFG guideline on the use of AI in peer review (form 4.04).',
     review_hint_as: 'For Assistive or Supportive: did you consciously accept or reject the AI\'s suggestions? Then Human.',
     resp: {
       label: 'Who is accountable?',
@@ -635,16 +650,28 @@ function buildSpec05(enableM) {
       create_own: 'Create your own label',
       overview_title: 'Levels and statements',
       overview_sub: 'How the letters in the code are defined.',
-      principles: ['A concerns form only.', 'S concerns the groundwork for the content.', 'With M and G, AI content is part of the work.'],
+      principles: ['A concerns form only, the message stays.', 'S concerns the groundwork for the content.', 'With M and G, AI content is part of the work.'],
       cases_title: 'Borderline cases for the extent',
+      am_example: {
+        title: 'Example: the line between A and M',
+        original_label: 'Original sentence:',
+        original: 'The participants mostly found the tool helpful, but some had problems logging in.',
+        head: ['What the AI does', 'Result', 'Level'],
+        rows: [
+          ['Fix typos', 'same sentence, without errors', 'A'],
+          ['Polish the wording', '“Most rated the tool as helpful; a few had difficulties logging in.”', 'A, the message stays'],
+          ['Shorten', '“The participants found the tool helpful.”', 'M, the problems are now missing'],
+        ],
+      },
       cases: [
-        ['Correcting spelling and grammar, smoothing single sentences', 'A', 'form only'],
+        ['Correcting spelling and grammar', 'A', 'form only'],
+        ['Having your own text polished, even whole paragraphs', 'A', 'message unchanged'],
         ['Translating your own text, transcribing your own recording', 'A', 'form only, message unchanged'],
         ['Improving image quality', 'A', 'form only'],
         ['Ideas, outline, research, feedback, explanations', 'S', 'groundwork, no AI content in the work'],
         ['Debugging: the AI points out the error, you fix it yourself', 'S', 'groundwork, no AI content in the work'],
-        ['Having the AI rephrase your own paragraphs', 'M', 'AI content in the work: existing work changed'],
-        ['Adopting code changed by the AI', 'M', 'AI content in the work: existing work changed'],
+        ['Having your own text shortened, restructured or sharpened in its message', 'M', 'AI content in the work: message changed'],
+        ['Adopting code changed by the AI', 'M', 'AI content in the work: with code, the code itself is the content'],
         ['Photo: object removed, background replaced', 'M', 'AI content in the work: existing work changed'],
         ['New AI code adopted', 'G', 'AI content in the work: newly generated'],
         ['Summary, abstract, text from bullet points', 'G', 'newly generated; bullet points and prompts are not existing work'],
@@ -662,6 +689,7 @@ function buildSpec05(enableM) {
       delete t.helper.q2;
       // borderline cases for M count as G without level M
       t.page.cases = t.page.cases.map(([s, c, r]) => [s, c === 'M' ? 'G' : c, r]);
+      t.page.am_example.rows = t.page.am_example.rows.map(([a, res, lvl]) => [a, res, lvl.replace(/^M\b/, 'G')]);
     });
   }
 
@@ -680,10 +708,13 @@ function buildSpec05(enableM) {
       review: ['R:H', 'R:HM', 'R:M', 'R:N'],
       acc:    ['Acc:I', 'Acc:O', 'Acc:N'],
     },
-    // Groups for the extent: A and S leave no AI content in the work, M and G do
+    // Groups for the extent: A and S leave no AI content in the work, M and G do.
+    // The hosting step has no groups.
     groups: {
-      none: ['A', 'S'],
-      ai: enableM ? ['M', 'G'] : ['G'],
+      stamm: {
+        none: ['A', 'S'],
+        ai: enableM ? ['M', 'G'] : ['G'],
+      },
     },
     rules: {
       noAiAcc: ['Acc:I', 'Acc:O'],

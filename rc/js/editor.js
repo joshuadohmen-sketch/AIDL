@@ -60,7 +60,7 @@ function optId(dim, code) { return `opt-${dim}-${code.replace(':', '-').replace(
 function optInput(dim, code) { return document.getElementById(optId(dim, code)); }
 
 // Group of an extent code: 'none' (A, S: no AI content in the work), 'ai' (M, G) or null (N)
-const groupOf = code => Object.keys(SPEC_V.groups).find(g => SPEC_V.groups[g].includes(code)) || null;
+const groupOf = code => Object.keys(SPEC_V.groups.stamm).find(g => SPEC_V.groups.stamm[g].includes(code)) || null;
 
 function buildOptions() {
   document.querySelectorAll('.opts[data-dim]').forEach(box => {
@@ -72,10 +72,10 @@ function buildOptions() {
       const group = dim === 'stamm' ? groupOf(code) : null;
       // Group line before the first card of a group: spans its cards on wide screens,
       // an intermediate line in the single-column layout
-      if (group && SPEC_V.groups[group][0] === code) {
+      if (group && SPEC_V.groups.stamm[group][0] === code) {
         const line = el('div', { className: 'opt-group', id: `group-${group}`, attrs: { 'aria-hidden': 'true' } });
         line.style.setProperty('--gstart', i + 1);
-        line.style.setProperty('--gspan', SPEC_V.groups[group].length);
+        line.style.setProperty('--gspan', SPEC_V.groups.stamm[group].length);
         nodes.push(line);
       }
       const id = optId(dim, code);
@@ -387,12 +387,12 @@ function renderHelper() {
   $('#helper-body').replaceChildren(...nodes);
 }
 
-// ── Hosting helper "Not sure?": did the input leave your organisation?
+// ── Hosting helper "Not sure?": who operates the AI system? (DFG form 4.04)
 function renderHostHelper() {
   const hh = tr().host_helper, h = tr().helper, ui = tr().ui;
   const QUESTIONS = {
-    left: { text: hh.left, choices: [[true, ui.yes], [false, ui.no]] },
-    to: { text: hh.to, choices: [['public', hh.to_public], ['company', hh.to_company]] },
+    device: { text: hh.device, choices: [[true, ui.yes], [false, ui.no]] },
+    operator: { text: hh.operator, choices: [['institution', hh.op_institution], ['company', hh.op_company]] },
     contract: { text: hh.contract, choices: [['yes', ui.yes], ['no', ui.no], ['unknown', ui.dont_know]] },
   };
   const btn = (label, onClick, cls = 'btn-secondary') => {
@@ -401,7 +401,7 @@ function renderHostHelper() {
     return b;
   };
   const nodes = [];
-  ['left', 'to', 'contract'].forEach(q => {
+  ['device', 'operator', 'contract'].forEach(q => {
     const v = hostHelperAnswers[q];
     if (v == null) return;
     const label = QUESTIONS[q].choices.find(([val]) => val === v)[1];

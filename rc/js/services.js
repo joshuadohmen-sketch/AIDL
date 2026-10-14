@@ -2,14 +2,15 @@
 // Only `name` goes into the label. `hint` appears only in the suggestion list.
 // `host` is a suggestion for the hosting step – every entry with a host must be
 // checked against the University of Koblenz contracts before going live.
-// Hosting criterion: did the input leave your organisation? Own device or own servers → H:L,
-// public institution → H:I, company → H:C (with contract) or H:C! (without).
+// Hosting follows the three variants of the DFG guideline (form 4.04): only on your own device → H:L,
+// operated by a trustworthy institution, your own organisation included → H:I,
+// a company as provider → H:C (with a contract that rules out the use of your input) or H:C! (without).
 // `generic`: the editor inserts "name/" and asks for the model.
 // The model list goes out of date quickly and is maintained by hand; nothing is loaded from outside.
 
 const SERVICES = [
   { group: { de: 'Eigene Organisation', en: 'Own organisation' }, items: [
-    { name: 'KI-Chat der eigenen Organisation', hint: { de: 'selbst betrieben', en: 'run by your organisation' }, host: 'H:L', generic: true },
+    { name: 'KI-Chat der eigenen Organisation', hint: { de: 'selbst betrieben', en: 'run by your organisation' }, host: 'H:I', generic: true },
     { name: 'KI-Chat der eigenen Organisation', hint: { de: 'Anbieter-Modell über Vertrag', en: 'provider model under contract' }, host: 'H:C', generic: true },
   ] },
   { group: { de: 'Öffentliche Dienste', en: 'Public services' }, items: [
@@ -23,9 +24,9 @@ const SERVICES = [
     { name: 'GitHub Copilot', hint: { de: 'privates Konto', en: 'private account' }, host: 'H:C!' },
   ] },
   { group: { de: 'Lokal', en: 'Local' }, items: [
-    { name: 'Ollama', hint: { de: 'eigenes Gerät oder eigener Server', en: 'own device or own server' }, host: 'H:L', generic: true },
+    { name: 'Ollama', hint: { de: 'eigenes Gerät', en: 'own device' }, host: 'H:L', generic: true },
     { name: 'LM Studio', hint: { de: 'eigenes Gerät', en: 'own device' }, host: 'H:L', generic: true },
-    { name: 'llama.cpp', hint: { de: 'eigenes Gerät oder eigener Server', en: 'own device or own server' }, host: 'H:L', generic: true },
+    { name: 'llama.cpp', hint: { de: 'eigenes Gerät', en: 'own device' }, host: 'H:L', generic: true },
   ] },
   { group: { de: 'Private Konten', en: 'Private accounts' }, items: [
     { name: 'ChatGPT', hint: { de: 'privates oder kostenloses Konto', en: 'private or free account' }, host: 'H:C!', generic: true },
