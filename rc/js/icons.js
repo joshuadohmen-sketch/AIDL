@@ -18,7 +18,7 @@ const ICONS = {
   'H:L': `<rect x="3.2" y="4.8" width="17.6" height="11.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.3 19.8h5.4M12 16.2v3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`,
   'H:I': `<path d="M3.5 8.6L12 3.4l8.5 5.2v.9h-17z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5.6 12v5.2M9.9 12v5.2M14.1 12v5.2M18.4 12v5.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.5 20.4h17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`,
   'H:C': `<path d="M2.8 13.4A3.8 3.8 0 0 1 7.4 9.7A5.2 5.2 0 0 1 17.75 9.7A3.8 3.8 0 0 1 17 17.2H6.6A3.8 3.8 0 0 1 2.8 13.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.2 12.4l2 2 3.6-3.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
-  'H:C!': `<path d="M2.8 13.4A3.8 3.8 0 0 1 7.4 9.7A5.2 5.2 0 0 1 17.75 9.7A3.8 3.8 0 0 1 17 17.2H6.6A3.8 3.8 0 0 1 2.8 13.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M11.8 8.6v3.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="11.8" cy="14.6" r="1.05" fill="currentColor"/>`,
+  'H:C!': `<path d="M2.8 13.4A3.8 3.8 0 0 1 7.4 9.7A5.2 5.2 0 0 1 17.75 9.7A3.8 3.8 0 0 1 17 17.2H6.6A3.8 3.8 0 0 1 2.8 13.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M11.8 8.1v2.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="11.8" cy="13.55" r="1.05" fill="currentColor"/>`,
 
   // ── Review – one eye family: pupil shape encodes the reviewer
   'R:H': `<path d="M2.6 12S6.1 5.9 12 5.9 21.4 12 21.4 12 17.9 18.1 12 18.1 2.6 12 2.6 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" fill="currentColor"/>`,
@@ -48,6 +48,20 @@ function svgEsc(s) {
 
 let badgeSeq = 0;
 
+// Splits a badge word longer than 16 characters at the word boundary that gives the
+// most even lines, e.g. "Commercial with DPA" → ["Commercial", "with DPA"].
+function badgeLines(word, max = 16) {
+  const parts = String(word).split(' ');
+  if (word.length <= max || parts.length < 2) return [word];
+  let best = null;
+  for (let k = 1; k < parts.length; k++) {
+    const a = parts.slice(0, k).join(' '), b = parts.slice(k).join(' ');
+    const worst = Math.max(a.length, b.length);
+    if (!best || worst < best.worst) best = { worst, lines: [a, b] };
+  }
+  return best.lines;
+}
+
 // state: normalized (one code per dimension)
 // opts: { version, words: { code: word } | null (null → codes under the circles, 0.4 style),
 //         title (code string), desc (plain-language sentence), url }
@@ -65,9 +79,12 @@ function buildBadgeSVG(state, opts = {}) {
   if (dims.length === 0) return '';
 
   const caption = c => (words && words[c]) || c;
+  // Words over 16 characters break at a word boundary into two balanced lines
+  const lines = dims.map(c => badgeLines(caption(c)));
+  const lineCount = Math.max(...lines.map(l => l.length));
   // Conservative average glyph widths: Arial 11 px for words, Courier 10 px for codes
   const charW = words ? 6.4 : 6.6;
-  const widths = dims.map(c => caption(c).length * charW);
+  const widths = lines.map(l => Math.max(...l.map(s => s.length)) * charW);
 
   const r = 22, padX = 20, padY = 14, cy = padY + r;
   const wmW = 64, divX = padX + wmW + 10;
@@ -78,8 +95,9 @@ function buildBadgeSVG(state, opts = {}) {
   }
   const last = dims.length - 1;
   const totalW = Math.ceil(centers[last] + Math.max(r, widths[last] / 2) + padX);
-  // with words: word, then the code in small grey type underneath
-  const h = r * 2 + padY + (words ? 42 : 30);
+  // with words: word (one or two lines), then the code in small grey type underneath
+  const lineH = 13;
+  const h = r * 2 + padY + (words ? 42 : 30) + (lineCount - 1) * lineH;
 
   const id = `dtl-badge-${++badgeSeq}`;
   const a11y = opts.title
@@ -108,10 +126,11 @@ function buildBadgeSVG(state, opts = {}) {
     body += `
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="#000000"/>
       <g transform="translate(${cx - 12},${cy - 12})">${iconPaths}</g>
-      <text x="${cx}" y="${cy + r + 16}" text-anchor="middle" ${text}>${svgEsc(caption(code))}</text>`;
+      <text x="${cx}" y="${cy + r + 16}" text-anchor="middle" ${text}>${lines[i]
+        .map((s, k) => `<tspan x="${cx}" dy="${k ? lineH : 0}">${svgEsc(s)}</tspan>`).join('')}</text>`;
     if (words) {
       body += `
-      <text x="${cx}" y="${cy + r + 29}" text-anchor="middle" font-family="'Courier New',monospace"
+      <text x="${cx}" y="${cy + r + 29 + (lines[i].length - 1) * lineH}" text-anchor="middle" font-family="'Courier New',monospace"
             font-size="9" font-weight="700" fill="#6e6e6e">${svgEsc(code)}</text>`;
     }
   });
@@ -160,4 +179,4 @@ function downloadBadgePNG(container = '#badge-container') {
   img.src = svgUrl;
 }
 
-if (typeof module !== 'undefined') module.exports = { ICONS, iconSVG, buildBadgeSVG };
+if (typeof module !== 'undefined') module.exports = { ICONS, iconSVG, buildBadgeSVG, badgeLines };

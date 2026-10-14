@@ -331,29 +331,32 @@ function art50Hint(state) {
   return { visible, open, icon: euIconSuggestion(state) };
 }
 
-// ── Decision helper "Not sure? A few questions" (A.1.4)
-// answers: { q1, q1b, q2, q2b, q3 } with true/false; q3 ∈ 'M' | 'G' | 'both'
-// Returns the suggested code, or null while a question is still open.
+// ── Decision helper "Not sure?" for the extent
+// q1 separates the groups (AI content in the work or not); then at most one more
+// question per group, asked strongest first, so "the strongest level counts" is built in:
+//   q1 yes → q2: new content? yes G, no M      (without M: q1 yes → G)
+//   q1 no  → q3: ideas, outline, research? yes S, no → q4: language or form? yes A, no N
+// answers: { q1, q2, q3, q4 } with true/false. Returns the code, or null while a question is open.
 function helperResult(answers, enableM) {
   const a = answers || {};
   if (a.q1 == null) return null;
-  if (a.q1 === false) return a.q1b == null ? null : (a.q1b ? 'S' : 'N');
-  if (a.q2 == null) return null;
-  if (a.q2 === true) return a.q2b == null ? null : (a.q2b ? 'S' : 'A');
-  if (!enableM) return 'G';
+  if (a.q1 === true) {
+    if (!enableM) return 'G';
+    return a.q2 == null ? null : (a.q2 ? 'G' : 'M');
+  }
   if (a.q3 == null) return null;
-  return a.q3 === 'M' ? 'M' : 'G';
+  if (a.q3 === true) return 'S';
+  return a.q4 == null ? null : (a.q4 ? 'A' : 'N');
 }
 
 // Next open question id for the helper, or null when a result is available.
 function helperNext(answers, enableM) {
   const a = answers || {};
   if (a.q1 == null) return 'q1';
-  if (a.q1 === false) return a.q1b == null ? 'q1b' : null;
-  if (a.q2 == null) return 'q2';
-  if (a.q2 === true) return a.q2b == null ? 'q2b' : null;
-  if (!enableM) return null;
-  return a.q3 == null ? 'q3' : null;
+  if (a.q1 === true) return (enableM && a.q2 == null) ? 'q2' : null;
+  if (a.q3 == null) return 'q3';
+  if (a.q3 === true) return null;
+  return a.q4 == null ? 'q4' : null;
 }
 
 // ── Hosting helper "Not sure?": did the input leave your organisation?

@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const core = require('../js/label-core.js');
 const { SPEC } = require('../js/spec.js');
-const { ICONS, buildBadgeSVG } = require('../js/icons.js');
+const { ICONS, buildBadgeSVG, badgeLines } = require('../js/icons.js');
 const { EXAMPLES } = require('../js/examples.js');
 
 const t = SPEC['0.5'].i18n.de;
@@ -29,14 +29,16 @@ test('badge is neutral and carries title, description and metadata', () => {
     assert.ok(svg.includes(`<desc id=`) && svg.includes(sentence.replace(/&/g, '&amp;').replace(/"/g, '&quot;')), `${ex.id}: desc`);
     assert.ok(svg.includes('<metadata>') && svg.includes('a=1&amp;b=2'), `${ex.id}: metadata escaped`);
     const words = n.stamm === 'N' ? [n.stamm, n.acc] : [n.stamm, n.host, n.review, n.acc];
-    for (const c of words) assert.ok(svg.includes(`>${t.badge[c]}<`), `${ex.id}: word for ${c}`);
+    for (const c of words) {
+      for (const line of badgeLines(t.badge[c])) assert.ok(svg.includes(`>${line}<`), `${ex.id}: word for ${c}`);
+    }
   }
 });
 
 test('N badge has no AI pictogram', () => {
   const svg = buildBadgeSVG({ stamm: 'N', acc: 'Acc:I' }, { version: '0.5', words: t.badge, title: 'AI-DTL 0.5: N/Acc:I' });
   assert.ok(!svg.includes(ICONS.G) && !svg.includes(ICONS.A));
-  assert.ok(svg.includes('>keine KI<'));
+  assert.ok(svg.includes('>No AI<'));
   assert.ok(svg.includes('>N<'), 'code under the word');
 });
 
@@ -44,6 +46,17 @@ test('circles keep at least 84 px distance so words do not overlap', () => {
   const svg = buildBadgeSVG({ stamm: 'G', host: 'H:I', review: 'R:HM', acc: 'Acc:O' }, { version: '0.5', words: t.badge });
   const xs = [...svg.matchAll(/<circle cx="([\d.]+)" cy="[\d.]+" r="22"/g)].map(m => +m[1]);
   for (let i = 1; i < xs.length; i++) assert.ok(xs[i] - xs[i - 1] >= 84, `gap ${xs[i] - xs[i - 1]}`);
+});
+
+test('words over 16 characters break into two lines and the badge grows', () => {
+  assert.deepEqual(badgeLines('Commercial with DPA'), ['Commercial', 'with DPA']);
+  assert.deepEqual(badgeLines('Commercial without DPA'), ['Commercial', 'without DPA']);
+  assert.deepEqual(badgeLines('Human + Machine'), ['Human + Machine']);
+  const height = svg => +/viewBox="0 0 [\d.]+ ([\d.]+)"/.exec(svg)[1];
+  const short = buildBadgeSVG({ stamm: 'G', host: 'H:L', review: 'R:H', acc: 'Acc:I' }, { version: '0.5', words: t.badge });
+  const long = buildBadgeSVG({ stamm: 'G', host: 'H:C', review: 'R:H', acc: 'Acc:I' }, { version: '0.5', words: t.badge });
+  assert.ok(long.includes('>Commercial</tspan>') && long.includes('>with DPA</tspan>'));
+  assert.equal(height(long) - height(short), 13);
 });
 
 test('unknown codes never reach the SVG', () => {

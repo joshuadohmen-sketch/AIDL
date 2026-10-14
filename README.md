@@ -100,14 +100,14 @@ Mit NVDA (Firefox/Chrome) oder VoiceOver (Safari) auf `rc/`:
 
 1. **Nur Tastatur**: Tab, Umschalt+Tab, Leertaste, Pfeiltasten. Für jedes Beispiel aus „Beispiel laden“
    das Label einmal von Hand nachbauen. Fokus ist immer sichtbar (roter Rahmen).
-2. **Schritte**: Die Legende jedes Schritts wird mit Nummer vorgelesen („Schritt 2 Welche KI-Werkzeuge …“).
+2. **Schritte**: Die Legende jedes Schritts wird mit Nummer vorgelesen („Schritt 2 Tool-Angabe“).
    Bei „Keine KI“ springen die Nummern lückenlos von 1 auf 2.
-3. **Optionen**: Name (z. B. „Neu erzeugt G“), Beschreibung und Zustand (aktiviert/nicht aktiviert,
+3. **Optionen**: Name (z. B. „Generative G“), Beschreibung, beim Ausmaß die Gruppe („Kein KI-Inhalt im Werk“ / „KI-Inhalt im Werk“) und Zustand (aktiviert/nicht aktiviert,
    Kontrollkästchen vs. Optionsfeld) werden angesagt.
 4. **Werkzeug**: Das Feld wird als Kombinationsfeld angesagt; Pfeil runter öffnet die Vorschläge,
    der aktive Vorschlag wird vorgelesen, Enter übernimmt. Blockierte Zeichen ; ( ) , | lösen einen
    gesprochenen Hinweis aus. Monat und Jahr sind als „Monat der letzten Nutzung“ gruppiert.
-5. **Rückmeldungen**: „Im Label: …“ unter Schritt 1 und 3, Host-Vorschlag, Hinweise und
+5. **Rückmeldungen**: „Im Label: …“ unter Schritt 1 und 3 (bei zwei oder mehr gewählten Optionen), „Unsicher?“-Hilfen (Fokus springt auf die erste Frage), Host-Vorschlag, Hinweise und
    „Es fehlt noch: …“ werden ohne Fokuswechsel angesagt (Live-Regionen).
 6. **Ergebnis**: Satz, Code-Link und Badge-Beschreibung (Bild mit Titel = Code, Beschreibung = Satz)
    werden vorgelesen. Kopieren sagt „Kopiert: …“ an.

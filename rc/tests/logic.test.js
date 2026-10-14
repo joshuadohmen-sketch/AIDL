@@ -65,18 +65,41 @@ test('Art. 50 box (A.8)', () => {
   assert.equal(core.art50Hint(n({ stamm: ['N'], acc: 'Acc:I' })).visible, false);
 });
 
-test('decision helper (A.1.4)', () => {
-  assert.equal(core.helperResult({ q1: false, q1b: true }, true), 'S');
-  assert.equal(core.helperResult({ q1: false, q1b: false }, true), 'N');
-  assert.equal(core.helperResult({ q1: true, q2: true, q2b: true }, true), 'S');
-  assert.equal(core.helperResult({ q1: true, q2: true, q2b: false }, true), 'A');
-  assert.equal(core.helperResult({ q1: true, q2: false, q3: 'M' }, true), 'M');
-  assert.equal(core.helperResult({ q1: true, q2: false, q3: 'G' }, true), 'G');
-  assert.equal(core.helperResult({ q1: true, q2: false, q3: 'both' }, true), 'G');
-  assert.equal(core.helperResult({ q1: true, q2: false }, false), 'G');
-  assert.equal(core.helperResult({ q1: true, q2: false }, true), null);
-  assert.equal(core.helperNext({ q1: true, q2: false }, true), 'q3');
-  assert.equal(core.helperNext({ q1: true, q2: false }, false), null);
+test('decision helper: q1 separates the groups, then one question per group', () => {
+  // AI content in the work
+  assert.equal(core.helperResult({ q1: true, q2: true }, true), 'G');
+  assert.equal(core.helperResult({ q1: true, q2: false }, true), 'M');
+  // without M: q1 yes is G at once
+  assert.equal(core.helperResult({ q1: true }, false), 'G');
+  assert.equal(core.helperNext({ q1: true }, false), null);
+  // no AI content in the work
+  assert.equal(core.helperResult({ q1: false, q3: true }, true), 'S');
+  assert.equal(core.helperResult({ q1: false, q3: false, q4: true }, true), 'A');
+  assert.equal(core.helperResult({ q1: false, q3: false, q4: false }, true), 'N');
+  // open questions
+  assert.equal(core.helperResult({}, true), null);
+  assert.equal(core.helperResult({ q1: true }, true), null);
+  assert.equal(core.helperResult({ q1: false, q3: false }, true), null);
+});
+
+test('decision helper asks q1 → q2 or q1 → q3 → q4', () => {
+  assert.equal(core.helperNext({}, true), 'q1');
+  assert.equal(core.helperNext({ q1: true }, true), 'q2');
+  assert.equal(core.helperNext({ q1: true, q2: false }, true), null);
+  assert.equal(core.helperNext({ q1: false }, true), 'q3');
+  assert.equal(core.helperNext({ q1: false, q3: true }, true), null);
+  assert.equal(core.helperNext({ q1: false, q3: false }, true), 'q4');
+  assert.equal(core.helperNext({ q1: false, q3: false, q4: true }, true), null);
+});
+
+test('study cases V13 and V19 (acceptance)', () => {
+  // V13: own paragraphs translated with DeepL, outline discussed with ChatGPT → S
+  assert.equal(core.helperResult({ q1: false, q3: true }, true), 'S');
+  // V19: group photo, person removed, sky replaced → M, and the Art. 50 box opens
+  assert.equal(core.helperResult({ q1: true, q2: false }, true), 'M');
+  const n = core.normalize({ stamm: ['M'], host: ['H:C'], review: 'R:H', acc: 'Acc:I',
+    tools: [{ name: 'Adobe Photoshop/Firefly', month: '10', year: '2026' }] }, '0.5');
+  assert.deepEqual(core.art50Hint(n), { visible: true, open: true, icon: 'partial' });
 });
 
 test('free text: no <>, no trailing full stop, 120 characters', () => {
@@ -138,8 +161,11 @@ test('spec without M has no M texts', () => {
   const spec = buildSpec05(false);
   assert.equal(spec.order.stamm.join(''), 'NASG');
   assert.equal(spec.i18n.de.opt.M, undefined);
-  assert.equal(spec.i18n.de.opt.G.lbl, 'Generativ');
-  assert.ok(spec.i18n.de.opt.G.dsc.includes('verändert'));
+  assert.equal(spec.i18n.de.opt.G.lbl, 'Generative');
+  assert.equal(spec.i18n.de.opt.G.dsc, 'Inhalt neu erzeugt oder Ihr Werk verändert');
+  assert.equal(spec.i18n.en.opt.G.dsc, 'New content generated or your work changed');
   assert.ok(spec.i18n.de.page.cases.every(([, code]) => code !== 'M'));
+  assert.deepEqual(spec.groups, { none: ['A', 'S'], ai: ['G'] });
+  assert.equal(spec.i18n.de.helper.q2, undefined);
   assert.equal(spec.warnings[1].trigger, 'G + R:N');
 });

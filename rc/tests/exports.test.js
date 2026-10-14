@@ -83,16 +83,44 @@ test('special characters are masked in every format', () => {
 test('Markdown: parentheses in the sentence stay unmasked', () => {
   const s = { ...STATES['D.1'], p: 'Gliederung (Kapitel 2)' };
   const md = core.buildExport('md', s, { v: '0.5', lang: 'de', base: SITE_BASE });
-  assert.ok(md.startsWith('> Inhalt von Menschen; KI hat die Arbeit unterstützt. KI eingesetzt für: Gliederung (Kapitel 2).'));
+  assert.ok(md.startsWith('> Inhalt von Menschen; KI hat bei der Vorarbeit geholfen. KI eingesetzt für: Gliederung (Kapitel 2).'));
 });
 
-test('option titles carry the letter of their code', () => {
+test('option titles: English, first word starts with the code letter, same in DE and EN', () => {
   const { SPEC } = require('../js/spec.js');
-  const de = SPEC['0.5'].i18n.de.opt;
-  for (const [code, o] of Object.entries(de)) {
+  const { de, en } = SPEC['0.5'].i18n;
+  for (const [code, o] of Object.entries(de.opt)) {
     const letter = code.includes(':') ? code.split(':')[1][0] : code;
-    const words = o.lbl.replace(/[()+]/g, ' ').split(/\s+/).filter(Boolean);
-    assert.ok(words.some(w => w[0] === letter), `${code}: ${o.lbl}`);
+    assert.equal(o.lbl[0], letter, `${code}: ${o.lbl}`);
+    assert.ok(!o.lbl.includes('('), `${code}: ${o.lbl}`);
+    assert.equal(en.opt[code].lbl, o.lbl, `${code}: DE and EN differ`);
+    assert.equal(de.badge[code], o.lbl, `${code}: badge word`);
+    assert.equal(en.badge[code], o.lbl, `${code}: badge word EN`);
+  }
+});
+
+// Collects every string in a nested text block
+function strings(obj, path = '', out = []) {
+  if (typeof obj === 'string') out.push([path, obj]);
+  else if (obj && typeof obj === 'object') Object.entries(obj).forEach(([k, v]) => strings(v, `${path}.${k}`, out));
+  return out;
+}
+
+test('no dashes in interface texts', () => {
+  const { SPEC, buildSpec05 } = require('../js/spec.js');
+  for (const spec of [SPEC['0.5'], buildSpec05(false)]) {
+    for (const lang of ['de', 'en']) {
+      for (const [path, s] of strings(spec.i18n[lang])) {
+        assert.ok(!s.includes(' – ') && !s.includes('—'), `${lang}${path}: ${s}`);
+      }
+    }
+  }
+});
+
+test('no comma before "und" in German texts', () => {
+  const { SPEC, buildSpec05 } = require('../js/spec.js');
+  for (const spec of [SPEC['0.5'], buildSpec05(false)]) {
+    for (const [path, s] of strings(spec.i18n.de)) assert.ok(!s.includes(', und '), `de${path}: ${s}`);
   }
 });
 

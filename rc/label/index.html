@@ -33,6 +33,9 @@
     .info-card p + p { margin-top: .5rem; }
     .overview-title { font-size: 1.4rem; font-weight: 800; }
     .cases-title { font-size: .95rem; font-weight: 700; margin: 1rem 0 .5rem; }
+    .group-title { font-size: .83rem; font-weight: 600; color: var(--g400); margin: .8rem 0 .4rem; border-bottom: 1px solid var(--g300); padding-bottom: 2px; }
+    .principles { margin-bottom: .6rem; }
+    .principles li { font-weight: 600; }
     .cases li { font-size: .89rem; }
     .cases li + li { margin-top: .3rem; }
     .cta { margin-top: 2rem; }
@@ -48,7 +51,7 @@
 <header class="site-header">
   <a class="logo-area" href="../">
     <span class="uk-mark">AI-DTL</span>
-    <span class="header-sub" id="header-version">v 0.5 (Vorschau)</span>
+    <span class="header-sub">AI Disclosure &amp; Transparency Label · <em id="header-version">v 0.5 (Vorschau)</em></span>
   </a>
   <div class="lang-switch" role="group" aria-label="Sprache / Language">
     <button type="button" id="btn-de" lang="de" aria-pressed="true">DE</button>
@@ -109,7 +112,7 @@ function sentenceNodes(t, sentence, rp) {
 
 // Without parameters: overview of all levels, borderline cases and the hosting rule
 function renderOverview(t, root, cta) {
-  document.title = 'AI-DTL – ' + t.page.overview_title;
+  document.title = 'AI-DTL · ' + t.page.overview_title;
   const spec = SPEC['0.5'];
   const nodes = [
     el('h1', { className: 'overview-title' }, t.page.overview_title),
@@ -117,17 +120,30 @@ function renderOverview(t, root, cta) {
   ];
   ['stamm', 'host', 'review', 'acc'].forEach(dim => {
     nodes.push(el('h2', { className: 'section-title' }, t.steps[dim].title));
-    spec.order[dim].forEach(c => nodes.push(dimCard(c, t.opt[c].lbl, t.opt[c].dsc)));
     if (dim === 'stamm') {
+      // the three guiding sentences, then the cards in their groups
+      nodes.push(el('div', { className: 'info-card principles' }, el('ul', {}, ...t.page.principles.map(p => el('li', {}, p)))));
+      spec.order.stamm.forEach(c => {
+        const group = Object.keys(spec.groups).find(g => spec.groups[g][0] === c);
+        if (group) nodes.push(el('h3', { className: 'group-title' }, group === 'none' ? t.ui.group_none : t.ui.group_ai));
+        nodes.push(dimCard(c, t.opt[c].lbl, t.opt[c].dsc));
+      });
       nodes.push(el('h3', { className: 'cases-title' }, t.page.cases_title));
       nodes.push(el('div', { className: 'info-card' }, el('ul', { className: 'cases' },
         ...t.page.cases.map(([situation, code, reason]) =>
-          el('li', {}, el('strong', {}, `${code} (${t.opt[code].lbl.replace(/\s*\([^)]*\)$/, '')})`), ` · ${situation} – ${reason}`)))));
+          el('li', {}, el('strong', {}, `${code} ${t.opt[code].lbl}`), ` · ${situation}: ${reason}`)))));
+      return;
     }
+    spec.order[dim].forEach(c => nodes.push(dimCard(c, t.opt[c].lbl, t.opt[c].dsc)));
     if (dim === 'host') {
-      nodes.push(el('div', { className: 'info-card' }, el('p', {}, t.page.host_rule), el('p', {}, t.host_hint)));
+      nodes.push(el('div', { className: 'info-card' },
+        el('p', {}, t.host_helper.intro), el('p', {}, t.host_rule), el('p', {}, t.host_hint)));
     }
   });
+  // moved here from the editor: generated from the same rules as the hints
+  nodes.push(el('h2', { className: 'section-title' }, t.ui.when_title));
+  nodes.push(el('div', { className: 'info-card' }, el('ul', {},
+    ...spec.warnings.map(r => el('li', {}, el('strong', {}, r.trigger), `: ${t.warn[r.id]}`)))));
   nodes.push(el('h2', { className: 'section-title' }, t.page.not_says_title));
   nodes.push(el('div', { className: 'info-card' }, el('p', {}, t.page.not_says)));
   nodes.push(el('h2', { className: 'section-title' }, t.page.eu_title));
@@ -157,7 +173,7 @@ function render() {
   if (!r) {
     // never echo the input
     root.replaceChildren(el('div', { className: 'error' }, el('h1', {}, t05.page.invalid), el('p', {}, t05.page.invalid_sub)), cta);
-    document.title = 'AI-DTL – ' + t05.page.invalid;
+    document.title = 'AI-DTL · ' + t05.page.invalid;
     return;
   }
 
@@ -171,7 +187,7 @@ function render() {
     const t04 = SPEC['0.4'].i18n[lang];
     const toolPart = s.tools.length ? ` (${s.tools.map(x => x.name + (x.date ? `, ${x.date}` : '')).join('; ')})` : '';
     const code = isN ? `AI-DTL 0.4: N/${s.acc}` : `AI-DTL 0.4: ${s.stamm}/${s.host};${s.review};${s.acc}${toolPart}`;
-    document.title = 'AI-DTL – ' + code;
+    document.title = 'AI-DTL · ' + code;
     const badge = el('div', { id: 'badge-container' });
     badge.innerHTML = buildBadgeSVG(s, { version: '0.4', title: code });
     nodes.push(el('section', { className: 'label-hero' },
@@ -188,7 +204,7 @@ function render() {
   } else {
     const code = LabelCore.buildCode(s, r.v);
     const sentence = LabelCore.buildSentence(s, lang, 'text', r.v);
-    document.title = 'AI-DTL – ' + code;
+    document.title = 'AI-DTL · ' + code;
     const badge = el('div', { id: 'badge-container' });
     badge.innerHTML = buildBadgeSVG(s, { version: r.v, words: t05.badge, title: code, desc: sentence, url: window.location.href });
     nodes.push(el('section', { className: 'label-hero' },

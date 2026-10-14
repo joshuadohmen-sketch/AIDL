@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI-DTL Generator · v 0.5 (Vorschau)</title>
+  <title>AI-DTL Generator · AI Disclosure &amp; Transparency Label (Vorschau 0.5)</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
 <header class="site-header">
   <a class="logo-area" href="./">
     <span class="uk-mark">AI-DTL</span>
-    <span class="header-sub" data-t="ui.header_version">v 0.5 (Vorschau)</span>
+    <span class="header-sub">AI Disclosure &amp; Transparency Label · <em data-t="ui.header_version">v 0.5 (Vorschau)</em></span>
   </a>
   <div class="lang-switch" role="group" aria-label="Sprache / Language">
     <button type="button" id="btn-de" lang="de" aria-pressed="true">DE</button>
@@ -34,22 +34,18 @@
 
   <form id="editor" class="steps" novalidate>
 
-    <!-- Ausmaß (stamm) -->
+    <!-- Ausmaß -->
     <fieldset class="step" id="step-stamm">
       <legend><span class="step-num"></span><span class="step-title" data-t="steps.stamm.title"></span></legend>
+      <button type="button" class="unsure-link" aria-expanded="false" aria-controls="helper" data-t="ui.unsure"></button>
       <p class="step-sub" data-t="steps.stamm.sub"></p>
       <p class="select-note" data-t="ui.multi"></p>
       <div class="opts" data-dim="stamm"></div>
       <p class="cumul" id="cumul-stamm" aria-live="polite"></p>
-      <details class="helper" id="helper">
-        <summary data-t="helper.title"></summary>
+      <div class="helper" id="helper" hidden>
+        <p class="helper-intro" data-t="helper.intro"></p>
         <div class="helper-body" id="helper-body" aria-live="polite"></div>
-      </details>
-      <p class="more-link"><a href="label/" data-t="ui.more_levels" target="_blank" rel="noopener"></a></p>
-      <div class="field" id="field-purpose">
-        <label for="purpose" data-t="purpose.label"></label>
-        <input type="text" id="purpose" maxlength="120" autocomplete="off" aria-describedby="purpose-help">
-        <small id="purpose-help" data-t="purpose.help"></small>
+        <p class="helper-more"><a href="label/" target="_blank" rel="noopener" data-t="helper.more"></a></p>
       </div>
       <p class="hint" id="no-ai-hint" data-t="no_ai_hint" hidden></p>
     </fieldset>
@@ -63,21 +59,23 @@
       <div class="tool-hints" id="tool-hints" aria-live="polite"></div>
     </fieldset>
 
-    <!-- Hosting (H) -->
+    <!-- Hosting -->
     <fieldset class="step" id="step-host">
       <legend><span class="step-num"></span><span class="step-title" data-t="steps.host.title"></span></legend>
+      <button type="button" class="unsure-link" aria-expanded="false" aria-controls="host-helper" data-t="ui.unsure"></button>
       <p class="step-sub" data-t="steps.host.sub"></p>
       <p class="select-note" data-t="ui.multi"></p>
       <div class="opts" data-dim="host"></div>
       <p class="cumul" id="cumul-host" aria-live="polite"></p>
-      <details class="helper" id="host-helper">
-        <summary data-t="host_helper.title"></summary>
+      <div class="helper" id="host-helper" hidden>
+        <p class="helper-intro" data-t="host_helper.intro"></p>
         <div class="helper-body" id="host-helper-body" aria-live="polite"></div>
-      </details>
-      <p class="hint" data-t="host_hint"></p>
+        <p class="helper-note" data-t="host_hint"></p>
+        <p class="helper-note" data-t="host_rule"></p>
+      </div>
     </fieldset>
 
-    <!-- Review (R) -->
+    <!-- Review -->
     <fieldset class="step" id="step-review">
       <legend><span class="step-num"></span><span class="step-title" data-t="steps.review.title"></span></legend>
       <p class="select-note" data-t="ui.single"></p>
@@ -85,82 +83,100 @@
       <p class="hint" id="review-hint" data-t="review_hint_as" hidden></p>
     </fieldset>
 
-    <!-- Accountability (Acc) -->
+    <!-- Accountability -->
     <fieldset class="step" id="step-acc">
       <legend><span class="step-num"></span><span class="step-title" data-t="steps.acc.title"></span></legend>
       <p class="step-sub" data-t="steps.acc.sub"></p>
       <p class="select-note" data-t="ui.single"></p>
       <div class="opts" data-dim="acc"></div>
-      <div class="field" id="field-resp">
-        <label for="resp" data-t="resp.label"></label>
-        <input type="text" id="resp" maxlength="120" autocomplete="off" aria-describedby="resp-help">
-        <small id="resp-help" data-t="resp.help"></small>
-      </div>
     </fieldset>
+
+    <!-- Optional details for the sentence -->
+    <details class="optional" id="optional">
+      <summary data-t="ui.optional"></summary>
+      <div class="optional-body">
+        <div class="field" id="field-purpose">
+          <label for="purpose" data-t="purpose.label"></label>
+          <input type="text" id="purpose" maxlength="120" autocomplete="off">
+        </div>
+        <div class="field" id="field-resp">
+          <label for="resp" data-t="resp.label"></label>
+          <input type="text" id="resp" maxlength="120" autocomplete="off" aria-describedby="resp-help">
+          <small id="resp-help" data-t="resp.help"></small>
+        </div>
+        <p class="optional-help" data-t="ui.optional_help"></p>
+      </div>
+    </details>
 
   </form>
 
-  <!-- Art. 50 -->
-  <details class="art50" id="art50" hidden>
-    <summary data-t="art50.title"></summary>
-    <div class="art50-body">
-      <p id="art50-question" data-t="art50.question"></p>
-      <div class="answers" role="radiogroup" aria-labelledby="art50-question">
-        <label><input type="radio" name="art50" value="yes"> <span data-t="ui.yes"></span></label>
-        <label><input type="radio" name="art50" value="no"> <span data-t="ui.no"></span></label>
-        <label><input type="radio" name="art50" value="unknown"> <span data-t="ui.dont_know"></span></label>
-      </div>
-      <div class="art50-answer" id="art50-answer" aria-live="polite"></div>
-    </div>
-  </details>
-
   <!-- Result -->
-  <section class="result-block" id="result" aria-labelledby="result-title">
-    <h2 id="result-title" data-t="ui.result_title"></h2>
-    <div class="missing" id="missing" aria-live="polite"></div>
-    <div id="result-body" hidden>
-      <p class="result-intro" data-t="ui.result_intro"></p>
-      <p class="sentence" id="sentence"></p>
-      <p class="code-line"><a id="code-link" class="code-link" target="_blank" rel="noopener"></a></p>
-      <div id="badge-container"></div>
+  <section class="result" id="result" aria-labelledby="result-title">
+    <div class="label-box">
+      <div class="label-box-head">
+        <h2 id="result-title" data-t="ui.result_title"></h2>
+        <button type="button" class="copy-label" id="copy-label" data-fmt="text" data-t="ui.copy_label"></button>
+      </div>
+      <div class="missing" id="missing" aria-live="polite"></div>
+      <div id="result-body" hidden>
+        <p class="result-intro" data-t="ui.result_intro"></p>
+        <p class="sentence" id="sentence"></p>
+        <p class="code-text" id="code-text"></p>
+      </div>
     </div>
-    <div class="hints" id="hints" aria-live="polite" hidden></div>
-    <details class="warn-details">
-      <summary data-t="ui.when_title"></summary>
-      <div class="warn-details-body" id="when-body"></div>
-    </details>
-    <p class="part-label" id="part-label" data-t="ui.part_label" hidden></p>
-    <button type="button" class="study-copy" id="study-copy" data-t="ui.study_copy" hidden></button>
-    <div class="copy-row" id="copy-row">
-      <button type="button" class="copy-btn" data-fmt="text"   data-t="ui.btn_text"></button>
-      <button type="button" class="copy-btn" data-fmt="html"   data-t="ui.btn_html"></button>
-      <button type="button" class="copy-btn" data-fmt="md"     data-t="ui.btn_md"></button>
-      <button type="button" class="copy-btn" data-fmt="latex"  data-t="ui.btn_latex"></button>
-      <button type="button" class="copy-btn" data-fmt="link"   data-t="ui.btn_link"></button>
-      <button type="button" class="copy-btn" data-fmt="speech" data-t="ui.btn_speech"></button>
-      <button type="button" class="copy-btn" data-fmt="svg"    data-t="ui.btn_svg"></button>
-      <button type="button" class="copy-btn" data-fmt="png"    data-t="ui.btn_png"></button>
+
+    <div id="result-extra" hidden>
+      <p class="label-page-link"><a id="label-page-link" target="_blank" rel="noopener" data-t="ui.open_label_page"></a></p>
+      <div class="hints" id="hints" aria-live="polite" hidden></div>
+      <div id="badge-container"></div>
+      <div class="formats" id="copy-row">
+        <span class="formats-label" data-t="ui.more_formats"></span>
+        <button type="button" class="copy-btn" data-fmt="html"   data-t="ui.btn_html"></button>
+        <button type="button" class="copy-btn" data-fmt="md"     data-t="ui.btn_md"></button>
+        <button type="button" class="copy-btn" data-fmt="latex"  data-t="ui.btn_latex"></button>
+        <button type="button" class="copy-btn" data-fmt="link"   data-t="ui.btn_link"></button>
+        <button type="button" class="copy-btn" data-fmt="speech" data-t="ui.btn_speech"></button>
+        <button type="button" class="copy-btn" data-fmt="svg"    data-t="ui.btn_svg"></button>
+        <button type="button" class="copy-btn" data-fmt="png"    data-t="ui.btn_png"></button>
+      </div>
     </div>
     <p class="copy-status" id="copy-status" role="status"></p>
+
+    <p class="part-label" id="part-label" data-t="ui.part_label" hidden></p>
+
+    <details class="art50" id="art50" hidden>
+      <summary data-t="art50.title"></summary>
+      <div class="art50-body">
+        <p id="art50-question" data-t="art50.question"></p>
+        <div class="answers" role="radiogroup" aria-labelledby="art50-question">
+          <label><input type="radio" name="art50" value="yes"> <span data-t="ui.yes"></span></label>
+          <label><input type="radio" name="art50" value="no"> <span data-t="ui.no"></span></label>
+          <label><input type="radio" name="art50" value="unknown"> <span data-t="ui.dont_know"></span></label>
+        </div>
+        <div class="art50-answer" id="art50-answer" aria-live="polite"></div>
+      </div>
+    </details>
+
+    <button type="button" class="study-copy" id="study-copy" data-t="ui.study_copy" hidden></button>
+
     <div class="result-end">
       <button type="button" class="btn-secondary" id="restart-btn" data-t="ui.restart"></button>
+      <details class="examples" id="examples">
+        <summary data-t="ui.examples"></summary>
+        <ul class="examples-list" id="examples-list"></ul>
+      </details>
     </div>
   </section>
 
-  <details class="examples" id="examples">
-    <summary data-t="ui.examples"></summary>
-    <ul class="examples-list" id="examples-list"></ul>
-  </details>
-
   <footer>
     <span><span data-t="ui.footer_draft"></span> · <a href="https://joshuadohmen-sketch.github.io/AIDL/changelog/">Changelog</a></span>
-    <span class="footer-test" data-t="ui.footer_test"></span>
     <span>
       <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> ·
       <span data-t="ui.doi">DOI folgt (Zenodo)</span> ·
       <a href="https://github.com/joshuadohmen-sketch/AIDL/issues">Feedback</a> ·
       <a href="mailto:jdohmen@uni-koblenz.de">Joshua Dohmen</a>
     </span>
+    <span class="footer-test" data-t="ui.footer_test"></span>
   </footer>
 
 </main>

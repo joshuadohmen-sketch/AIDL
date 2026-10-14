@@ -33,9 +33,8 @@ const $ = sel => document.querySelector(sel);
 const tr = () => SPEC_V.i18n[lang];
 const txt = path => path.split('.').reduce((o, k) => (o == null ? o : o[k]), tr());
 const fillT = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
-// "H:C (Kommerziell mit Vertrag)" – the English key word in brackets is dropped here
-const shortLabel = code => tr().opt[code].lbl.replace(/\s*\([^)]*\)$/, '');
-const codeLabel = code => `${code} (${shortLabel(code)})`;
+// "H:C (Commercial with DPA)"
+const codeLabel = code => `${code} (${tr().opt[code].lbl})`;
 
 function el(tag, props, ...children) {
   const node = document.createElement(tag);
@@ -60,18 +59,34 @@ const currentURL = () => LabelCore.buildURL(S, V, siteBase());
 function optId(dim, code) { return `opt-${dim}-${code.replace(':', '-').replace('!', 'x')}`; }
 function optInput(dim, code) { return document.getElementById(optId(dim, code)); }
 
+// Group of an extent code: 'none' (A, S: no AI content in the work), 'ai' (M, G) or null (N)
+const groupOf = code => Object.keys(SPEC_V.groups).find(g => SPEC_V.groups[g].includes(code)) || null;
+
 function buildOptions() {
   document.querySelectorAll('.opts[data-dim]').forEach(box => {
     const dim = box.dataset.dim;
-    box.replaceChildren(...SPEC_V.order[dim].map(code => {
+    const order = SPEC_V.order[dim];
+    box.style.setProperty('--cols', order.length); // one row per step on wide screens
+    const nodes = [];
+    order.forEach((code, i) => {
+      const group = dim === 'stamm' ? groupOf(code) : null;
+      // Group line before the first card of a group: spans its cards on wide screens,
+      // an intermediate line in the single-column layout
+      if (group && SPEC_V.groups[group][0] === code) {
+        const line = el('div', { className: 'opt-group', id: `group-${group}`, attrs: { 'aria-hidden': 'true' } });
+        line.style.setProperty('--gstart', i + 1);
+        line.style.setProperty('--gspan', SPEC_V.groups[group].length);
+        nodes.push(line);
+      }
       const id = optId(dim, code);
+      const describedBy = `${id}-d` + (group ? ` group-${group}` : '');
       const input = el('input', {
         className: 'opt-input', type: INPUT_TYPE[dim], name: dim, value: code, id,
-        attrs: { 'aria-labelledby': `${id}-l ${id}-c`, 'aria-describedby': `${id}-d` },
+        attrs: { 'aria-labelledby': `${id}-l ${id}-c`, 'aria-describedby': describedBy },
       });
       const icon = el('span', { className: 'opt-icon', attrs: { 'aria-hidden': 'true' } });
       icon.innerHTML = iconSVG(code, 36); // fixed pictogram table
-      return el('label', { className: 'opt', htmlFor: id },
+      nodes.push(el('label', { className: 'opt', htmlFor: id },
         input,
         el('span', { className: 'opt-body' },
           el('span', { className: `opt-mark ${INPUT_TYPE[dim] === 'checkbox' ? 'square' : 'round'}`, attrs: { 'aria-hidden': 'true' } }),
@@ -79,8 +94,10 @@ function buildOptions() {
           el('span', { className: 'opt-text' },
             el('span', { className: 'code', id: `${id}-c` }, code),
             el('span', { className: 'lbl', id: `${id}-l` }),
-            el('span', { className: 'dsc', id: `${id}-d` }))));
-    }));
+            el('span', { className: 'dsc', id: `${id}-d` })))));
+    });
+    box.classList.toggle('grouped', dim === 'stamm');
+    box.replaceChildren(...nodes);
   });
 }
 
@@ -120,10 +137,15 @@ function onOptionChange(input) {
 function applyTexts() {
   const t = tr();
   document.documentElement.lang = lang;
-  document.title = `${t.ui.title} · ${t.ui.header_version}`;
+  document.title = t.ui.doc_title;
   document.querySelectorAll('[data-t]').forEach(node => {
     const s = txt(node.dataset.t);
     if (typeof s === 'string') node.textContent = s;
+  });
+  document.querySelectorAll('.step-sub').forEach(p => { p.hidden = !p.textContent; });
+  ['none', 'ai'].forEach(g => {
+    const line = document.getElementById(`group-${g}`);
+    if (line) line.textContent = g === 'none' ? t.ui.group_none : t.ui.group_ai;
   });
   document.querySelectorAll('.step-num').forEach(n => { n.dataset.word = t.ui.step; });
   document.querySelectorAll('.opt-input').forEach(input => {
@@ -142,10 +164,6 @@ function applyTexts() {
     b.addEventListener('click', () => loadExample(ex.id));
     return el('li', {}, b);
   }));
-
-  // "When does the editor show hints?" – generated from the same rules as the hints
-  $('#when-body').replaceChildren(el('ul', {},
-    ...LabelCore.warningRules(V).map(r => el('li', {}, el('strong', {}, r.trigger), ' – ' + t.warn[r.id]))));
 
   if (STUDY) {
     $('#study-banner').textContent = t.ui.study_banner + (STUDY_CASE ? ` · ${t.ui.study_case} ${STUDY_CASE}` : '');
@@ -248,7 +266,7 @@ function initCombo(input, list, i) {
         const idx = items.length;
         items.push(it);
         const li = el('li', { className: 'ac-item', id: `tool-opt-${i}-${idx}`, attrs: { role: 'option', 'aria-selected': 'false' } },
-          it.name, it.hint ? el('span', { className: 'ac-hint' }, ` – ${it.hint[lang]}`) : null);
+          it.name, it.hint ? el('span', { className: 'ac-hint' }, ` · ${it.hint[lang]}`) : null);
         li.addEventListener('mousedown', e => { e.preventDefault(); choose(idx); });
         nodes.push(li);
       });
@@ -332,13 +350,12 @@ function renderToolHints() {
   $('#tool-hints').replaceChildren(...notes);
 }
 
-// ── Decision helper (A.1.4)
+// ── Decision helper for the extent: q1 separates the groups, then one question per group
 function renderHelper() {
   const h = tr().helper, ui = tr().ui, enableM = SPEC_V.enableM;
-  const answerText = (q, v) => (q === 'q3' ? (v === 'both' ? h.q3_both : codeLabel(v)) : (v ? ui.yes : ui.no));
   const nodes = [];
-  ['q1', 'q1b', 'q2', 'q2b', 'q3'].forEach(q => {
-    if (helperAnswers[q] != null) nodes.push(el('p', { className: 'helper-done' }, `${h[q]} `, el('strong', {}, answerText(q, helperAnswers[q]))));
+  ['q1', 'q2', 'q3', 'q4'].forEach(q => {
+    if (helperAnswers[q] != null) nodes.push(el('p', { className: 'helper-done' }, `${h[q]} `, el('strong', {}, helperAnswers[q] ? ui.yes : ui.no)));
   });
   const next = LabelCore.helperNext(helperAnswers, enableM);
   const btn = (label, onClick, cls = 'btn-secondary') => {
@@ -354,11 +371,7 @@ function renderHelper() {
   };
   if (next) {
     nodes.push(el('p', { className: 'helper-q' }, h[next]));
-    const choices = next === 'q3'
-      ? [['M', codeLabel('M')], ['G', codeLabel('G')], ['both', h.q3_both]]
-      : [[true, ui.yes], [false, ui.no]];
-    nodes.push(el('div', { className: 'helper-btns' }, ...choices.map(([v, l]) => btn(l, answer(next, v)))));
-    if (next === 'q3') nodes.push(el('p', { className: 'helper-note' }, h.both_note));
+    nodes.push(el('div', { className: 'helper-btns' }, btn(ui.yes, answer(next, true)), btn(ui.no, answer(next, false))));
   } else {
     const code = LabelCore.helperResult(helperAnswers, enableM);
     nodes.push(el('p', { className: 'helper-result' }, fillT(h.result, { X: codeLabel(code) })));
@@ -479,18 +492,18 @@ function renderResult(n) {
   }
 
   $('#result-body').hidden = !ok;
+  $('#result-extra').hidden = !ok;
   if (ok) {
     const code = LabelCore.buildCode(S, V);
     const url = currentURL();
     const sentence = LabelCore.buildSentence(n, lang, 'text', V);
     $('#sentence').replaceChildren(...sentenceNodes(sentence, n.rp));
-    const link = $('#code-link');
-    link.textContent = code;
-    link.href = url;
+    $('#code-text').textContent = code;
+    $('#label-page-link').href = url;
     $('#badge-container').innerHTML = buildBadgeSVG(n, { version: V, words: t.badge, title: code, desc: sentence, url });
   }
 
-  document.querySelectorAll('#copy-row .copy-btn').forEach(b => b.setAttribute('aria-disabled', String(!ok)));
+  document.querySelectorAll('#copy-row .copy-btn, #copy-label').forEach(b => b.setAttribute('aria-disabled', String(!ok)));
   $('#study-copy').setAttribute('aria-disabled', String(!ok));
 
   // Hints (A.7): concrete, for the person creating the label only
@@ -545,11 +558,11 @@ function update() {
   resp.disabled = S.acc === 'Acc:N';
   if (resp.disabled && S.rp) { S.rp = ''; resp.value = ''; }
 
-  // Cumulation feedback (A.1.3, A.3.3)
+  // Cumulation feedback, only when two or more are chosen
   const t = tr();
-  $('#cumul-stamm').textContent = S.stamm.length ? fillT(t.cumul.stamm, { X: codeLabel(n.stamm) }) : '';
+  $('#cumul-stamm').textContent = S.stamm.length >= 2 ? fillT(t.cumul.stamm, { X: codeLabel(n.stamm) }) : '';
   const host = LabelCore.effectiveHost(S.host, V);
-  $('#cumul-host').textContent = host ? fillT(t.cumul.host, { X: codeLabel(host) }) : '';
+  $('#cumul-host').textContent = S.host.length >= 2 ? fillT(t.cumul.host, { X: codeLabel(host) }) : '';
 
   $('#review-hint').hidden = !(n.stamm === 'A' || n.stamm === 'S');
 
@@ -618,6 +631,8 @@ function loadState(next, opts = {}) {
   Object.keys(rowHint).forEach(k => delete rowHint[k]);
   $('#legacy-notice').hidden = !opts.legacy;
   if (opts.legacy) $('#legacy-notice').textContent = tr().ui.legacy_loaded;
+  // the optional details open by themselves when the loaded label carries them
+  $('#optional').open = !!(S.p || S.rp);
   syncForm();
   renderToolRows();
   renderHelper();
@@ -640,9 +655,13 @@ function loadExample(id) {
   first.focus({ preventScroll: true });
 }
 
+function setHelperOpen(btn, open) {
+  btn.setAttribute('aria-expanded', String(open));
+  document.getElementById(btn.getAttribute('aria-controls')).hidden = !open;
+}
+
 function restart() {
-  $('#helper').open = false;
-  $('#host-helper').open = false;
+  document.querySelectorAll('.unsure-link').forEach(b => setHelperOpen(b, false));
   $('#art50').open = false;
   loadState({}, { touched: false });
   const first = document.querySelector('#step-stamm .opt-input');
@@ -700,7 +719,16 @@ function init() {
   $('#restart-btn').addEventListener('click', restart);
   $('#btn-de').addEventListener('click', () => setLang('de'));
   $('#btn-en').addEventListener('click', () => setLang('en'));
-  document.querySelectorAll('#copy-row .copy-btn').forEach(b => b.addEventListener('click', () => onExport(b)));
+  document.querySelectorAll('#copy-row .copy-btn, #copy-label').forEach(b => b.addEventListener('click', () => onExport(b)));
+  // "Not sure?" links open the helper right below the cards
+  document.querySelectorAll('.unsure-link').forEach(b => b.addEventListener('click', () => {
+    const open = b.getAttribute('aria-expanded') !== 'true';
+    setHelperOpen(b, open);
+    if (open) {
+      const first = document.getElementById(b.getAttribute('aria-controls')).querySelector('button');
+      if (first) first.focus();
+    }
+  }));
   const studyBtn = $('#study-copy');
   studyBtn.addEventListener('click', () => {
     if (studyBtn.getAttribute('aria-disabled') === 'true') return;
